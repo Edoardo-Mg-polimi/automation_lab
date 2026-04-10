@@ -1,0 +1,65 @@
+# =========================
+# MATLAB / Simulink
+# =========================
+
+# Autosave, backup, temporary
+*.asv
+*.m~
+*.autosave
+*.bak
+*.tmp
+*.temp
+
+# MATLAB preferences / local cache
+*.mlx.autosave
+*.slxc
+*.mex*
+*.p
+
+# Simulink generated folders
+slprj/
+sfprj/
+sccprj/
+simulink_cache/
+simulink_codegen/
+codegen/
+
+# Simulink generated code folders
+*_ert_rtw/
+*_grt_rtw/
+*_rtw/
+rtw/
+work/
+
+# Stateflow / Simulink temporary files
+*.rtw
+*.tlc
+*.tmf
+*.d
+*.obj
+*.o
+*.a
+*.lib
+*.exp
+*.dll
+*.so
+*.dylib
+*.exe
+
+# Simulation outputs and logs
+*.log
+*.dat
+*.mat~
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# MATLAB project local settings
+resources/project/Root.type.Files/Layout.xml
+resources/project/Root.type.Files/References.xml
+resources/project/Root.type.Files/labels.json
