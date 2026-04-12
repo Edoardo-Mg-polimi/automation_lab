@@ -28,7 +28,7 @@ g = 9.81; %[m/s^2] gravity
 Kb = 2.83e-3; %[m/V] ball position sensitivity
 
 
-%% 1) Modello circuito LR
+%% 1) Modello circuito RL
 s = tf('s');
 fprintf("T fdt circuito RL: \n");
 wp = R/L;            % unico polo di T(s) calcolabile anche con funzione pole
@@ -73,15 +73,16 @@ title('Diagramma di Nyquist di T')
 
 % 1.1) REGOLATORE RL
 % Sintesi con metodo di BODE
-
+Kp = 29.962945;
+Ki = 5531.893013;
 
 % Sintesi diretta
 wc = 5*wp;           % prova iniziale conservativa
 wz = wp;             %cancellazione polo zero
 % Kp = L* (wc/Kg);
 % Ki = R* (wc/Kg);
-Kp = 6.8573;
-Ki = 470.5931;
+% Kp = 6.8573;
+% Ki = 470.5931;
 fprintf("Anello corrente L_i = PI*T \n");
 Ci  = Kp + Ki/s;
 [numCi, denCi] = tfdata(Ci, 'v');
@@ -150,7 +151,9 @@ title('Diagramma di Nyquist di W')
 
 % 2.3 - Comparazione con controllo corrente
 delta_x_max = (V_max - R*x3e) / (wcp*L*sqrt(m*g/km));
-fprintf("\nMassima variazione di posizione controllabile da anello corrente: delta_x_max=%f m\n", delta_x_max);
+fprintf("\nLimite Tensione\nMassima variazione di posizione controllabile da anello corrente: delta_x_max=%f m\n", delta_x_max);
+delta_x_max = I_max/sqrt(m*g/km);
+fprintf("\nLimite Corrente\nMassima variazione di posizione controllabile da anello corrente: delta_x_max=%f m\n", delta_x_max);
 
 %comparazione tra costanti di tempo
 fprintf("TAU RL | TAU contr | TAU W \n");

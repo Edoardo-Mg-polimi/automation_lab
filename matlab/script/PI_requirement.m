@@ -80,3 +80,10 @@ fprintf("\nCaso peggiore: salto istantaneo da x=0 a x=xe=l/2 -r");
 fprintf("\nPulsazione di taglio massima: wc_max=%f rad/s\n", wc_max);
 
 
+%Limite di corrente
+delta_x_max = I_max/sqrt(m*g/km)
+fprintf("Limite di corrente: massimo salto di posizione=%f", delta_x_max);
+
+% CON L'AUMENTARE DELLA wc DIMINUISCE IL SALTO MASSIMO DI POSIZIONE CHE IL
+% CONTROLLO DI CORRENTE RIESCE A INSEGUIRE
+
