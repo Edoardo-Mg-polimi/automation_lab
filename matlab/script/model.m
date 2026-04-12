@@ -73,16 +73,16 @@ title('Diagramma di Nyquist di T')
 
 % 1.1) REGOLATORE RL
 % Sintesi con metodo di BODE
-Kp = 29.962945;
-Ki = 5531.893013;
+% Kp = 29.962945;
+% Ki = 5531.893013;
 
 % Sintesi diretta
 wc = 5*wp;           % prova iniziale conservativa
 wz = wp;             %cancellazione polo zero
 % Kp = L* (wc/Kg);
 % Ki = R* (wc/Kg);
-% Kp = 6.8573;
-% Ki = 470.5931;
+Kp = 6.8573;
+Ki = 470.5931;
 fprintf("Anello corrente L_i = PI*T \n");
 Ci  = Kp + Ki/s;
 [numCi, denCi] = tfdata(Ci, 'v');
@@ -110,9 +110,8 @@ title('Nyquist L(s) anello aperto')
 fprintf("\n Hi fdt in retroazione \n");
 Hi = Li/(1+Li);
 Hi = minreal(Hi);
-p = pole(Hi)
-tau_Hi = 1/abs(p(1));
-fprintf("Cosatnte di tempo RL controllato: %f \n", tau_Hi);
+p = pole(Hi);
+
 
 
 %% 2) Modello meccanico linearizzato
@@ -155,12 +154,6 @@ fprintf("\nLimite Tensione\nMassima variazione di posizione controllabile da ane
 delta_x_max = I_max/sqrt(m*g/km);
 fprintf("\nLimite Corrente\nMassima variazione di posizione controllabile da anello corrente: delta_x_max=%f m\n", delta_x_max);
 
-%comparazione tra costanti di tempo
-fprintf("TAU RL | TAU contr | TAU W \n");
-fprintf("%f|%f|%f  ", tau_RL, tau_Hi, tau_W);
-if (tau_Hi < tau_W)
-    fprintf("PI ok: veloctà nel range");
-end
 
  
 % %Calcolo tramite state space representation

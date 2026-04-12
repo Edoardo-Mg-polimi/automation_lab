@@ -69,3 +69,10 @@ fprintf("Kp = %f\n", Kp);
 fprintf("Ki = %f\n", Ki);
 %% 4) PI
 PI = Kp + Ki/s
+
+%% Limiti di delta I e delta x
+%massimo gradino di corrente inseguibile
+delta_i_max = (V_max - R*x3e) / (wc*L);
+fprintf("Massimo gradino di corrente inseguibile: delta_i_max=%f A\n", delta_i_max);
+delta_x_max = delta_i_max/sqrt(m*g/km);
+fprintf("Massimo gradino di posizione inseguibile: delta_x_max=%f m\n", delta_x_max);
