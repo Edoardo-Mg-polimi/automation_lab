@@ -76,15 +76,10 @@ title('Diagramma di Nyquist di T')
 % Kp = 29.962945;
 % Ki = 5531.893013;
 
-% Sintesi diretta
-wc = 5*wp;           % prova iniziale conservativa
-wz = wp;             %cancellazione polo zero
-% Kp = L* (wc/Kg);
-% Ki = R* (wc/Kg);
-Kp = 6.8573;
-Ki = 470.5931;
+Kp_i = 6.8573;
+Ki_i = 470.5931;
 fprintf("Anello corrente L_i = PI*T \n");
-Ci  = Kp + Ki/s;
+Ci  = Kp_i + Ki_i/s;
 [numCi, denCi] = tfdata(Ci, 'v');
 
 % 1.3) FDT ANELLO APERTO
@@ -92,8 +87,8 @@ Li = Ci * Kg * T;
 [numLi, denLi] = tfdata(Li, 'v');
 p_i = pole(Li)
 z_i = zero(Li)
-[gm, pm, wcg, wcp] = margin(Li);
-fprintf("Gain margin=%f ,Phase margin=%f ,w_c=%f \n", gm, pm, wcp);
+[gm, pm, wcg, wcp_i] = margin(Li);
+fprintf("Gain margin=%f ,Phase margin=%f ,w_c=%f \n", gm, pm, wcp_i);
 
 % Diagrammi
 figure
@@ -123,7 +118,7 @@ x3e = sqrt((m*g/km) * (x1e + 2*r -l)^2); % corrente di equilibrio ie(xe)
 u_e = x3e * R;
 
 k1 = (2 * km * x3e^2)/(m * (l -2*r -x1e)^3);
-k2 = (2 * km * x3e)/(m * (l-2*r -x1e)^2);
+k2 = (2 * km * x3e)/(m * (l -2*r -x1e)^2);
 
 % 2.1 - TF
 fprintf("W fdt pallina: \n");
@@ -149,23 +144,21 @@ title('Diagramma di Nyquist di W')
 
 
 % 2.3 - Comparazione con controllo corrente
-delta_x_max = (V_max - R*x3e) / (wcp*L*sqrt(m*g/km));
-fprintf("\nLimite Tensione\nMassima variazione di posizione controllabile da anello corrente: delta_x_max=%f m\n", delta_x_max);
-delta_x_max = I_max/sqrt(m*g/km);
-fprintf("\nLimite Corrente\nMassima variazione di posizione controllabile da anello corrente: delta_x_max=%f m\n", delta_x_max);
-
+%massimo gradino di corrente inseguibile
+delta_i_max = (V_max - R*x3e) / (wcp_i*L);
+fprintf("Massimo gradino di corrente inseguibile intorno a ie: delta_i_max=%f A\n", delta_i_max);
 
  
-% %Calcolo tramite state space representation
-% % F = [0, 1;
-% %     k1, 0];
-% % 
-% % G = [0; k2];
-% % 
-% % H = [1, 0];
-% % 
-% % system = ss(F, G, H, 0); 
-% % W = tf(system)
+% Calcolo tramite state space representation
+% F = [0, 1;
+%     k1, 0];
+% 
+% G = [0; k2];
+% 
+% H = [1, 0];
+% 
+% system = ss(F, G, H, 0); 
+% W = tf(system)
 
 %% Modello completo open loop senza controllori
 % %State space representation dell'intero sistema

@@ -56,8 +56,8 @@ W = k2/(s^2 -k1);
 p = pole(W);   % poli
 wm = abs(p(1));
 %% 3) BODE syntesis 
-wc = 5*wm;
-phase_m = 60; %margine di fase in deg
+wc = 2*wm;
+phase_m = 90; %margine di fase in deg
 fprintf("Requirements: wc=%f , phase margin=%f \n", wc, phase_m);
 
 phiG_deg = -atand((wc*L)/R);%fase a omega c
@@ -69,10 +69,20 @@ fprintf("Kp = %f\n", Kp);
 fprintf("Ki = %f\n", Ki);
 %% 4) PI
 PI = Kp + Ki/s
+[numCi, denCi] = tfdata(PI, 'v');
 
-%% Limiti di delta I e delta x
+%% 5) Limiti di delta I
 %massimo gradino di corrente inseguibile
 delta_i_max = (V_max - R*x3e) / (wc*L);
 fprintf("Massimo gradino di corrente inseguibile: delta_i_max=%f A\n", delta_i_max);
-delta_x_max = delta_i_max/sqrt(m*g/km);
-fprintf("Massimo gradino di posizione inseguibile: delta_x_max=%f m\n", delta_x_max);
+
+%% 6) Check
+Li = PI * Kg * T;
+[numLi, denLi] = tfdata(Li, 'v');
+p_i = pole(Li)
+z_i = zero(Li)
+[gm, pm, wcg, wcp_i] = margin(Li);
+fprintf("Gain margin=%f ,Phase margin=%f ,w_c=%f \n", gm, pm, wcp_i);
+
+Hi = minreal(Li/(1+Li))
+poles_Hi = pole(Hi)
