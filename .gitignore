@@ -63,3 +63,37 @@ Thumbs.db
 resources/project/Root.type.Files/Layout.xml
 resources/project/Root.type.Files/References.xml
 resources/project/Root.type.Files/labels.json
+
+# =========================
+# LaTeX
+# =========================
+
+# Build intermediates and logs
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+
+# Beamer / glossaries / nomenclature
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
+*.nav
+*.snm
+*.vrb
