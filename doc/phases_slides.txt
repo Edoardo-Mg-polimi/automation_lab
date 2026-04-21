@@ -1,0 +1,47 @@
+EXPECTED STEPS
+
+
+preliminaries
+• model of the set-up at hand
+• identification of those parameters that are difficult to measure
+(friction coefficient, spring stiffness, etc.)
+• model validation via time and frequency responses
+• open-loop analysis (stability, observability, controllability,
+operating range, performance)
+list of self-given specifications for the close-loop system
+for each control task
+• design based on a linearized/nonlinear model
+• test of the controller on the model via simulation
+• controller validation via time and frequency responses
+critical analysis/comparison of all developed control strategies
+
+
+Time validation
+input impulse/step to u(t) (or y◦(t) in close loop)
+record output response y(t) (and u(t) in close loop)
+compare with model impulse/step response
+in terms of gain, settling time
+
+Frequency validation
+input sine waves to u(t) (or y◦(t) in close loop)
+record output (sine) responses y(t) (and u(t) in close loop)
+compare with model frequency response on a Bode diagram
+
+
+Control techniques
+Frequency-Based (FB) techniques
+• compute the transfer function G(s) of the linearized system
+• design the R(s) such that L(s) has desired properties
+• design via Bode diagrams (or root locus or Nyquist)
+State-Space (SS) techniques
+• compute the state-space representation of the linearized system
+• design state estimators (Luenberger observer & Kalman filter)
+• design Pole-Placement & Linear-Quadratic controllers
+Advance-Control (AC) techniques, for example:
+• Model Predictive Control (MPC)
+• Sliding Mode
+• Feedback Linearization
+• Adaptive/Robust Control
+
+
+
