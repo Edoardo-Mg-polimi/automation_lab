@@ -135,6 +135,7 @@ p_obs = [-150 -180];
 % Guadagno osservatore con formula di Ackermann
 L_obs = acker(A_x', C_x', p_obs)';
 
+
 fprintf('\nGuadagno osservatore L_obs:\n');
 disp(L_obs);
 
@@ -157,7 +158,7 @@ SS_obs = ss(A_obs, B_obs, C_obs, D_obs);
 fprintf('\nModello state-space osservatore:\n');
 SS_obs
 
-%% 4) Pole Placement controller con Ackermann
+%% 4) Pole Placement controller
 fprintf(' 4) POLE PLACEMENT CONTROLLER - ACKERMANN\n');
 % Verifica controllabilità
 Mr_pp = ctrb(A_x, B_x);
@@ -198,51 +199,4 @@ fprintf('Guadagno reference:\n');
 disp(K_ref);
 
 
-
-% Risposta al gradino sul riferimento di posizione linearizzato
-% Esempio: step di 1 mm attorno al punto di equilibrio
-delta_x_ref_step = 1e-3;
-
-figure;
-step(delta_x_ref_step * SS_cl_pp);
-grid on;
-title('Pole Placement - risposta a step di riferimento posizione');
-xlabel('Time [s]');
-ylabel('\Delta x [m]');
-
-% Controllo dello sforzo di corrente richiesto
-% Simulo la risposta e calcolo:
-%   delta_i = -K_pp*x + Nbar*delta_x_ref
-t_sim = 0:0.001:2;
-r_sim = delta_x_ref_step * ones(size(t_sim));
-
-[y_sim, t_sim, x_sim] = lsim(SS_cl_pp, r_sim, t_sim);
-
-delta_i_sim = zeros(length(t_sim),1);
-
-for k = 1:length(t_sim)
-    xk = x_sim(k,:)';
-    delta_i_sim(k) = -K_pp*xk + K_ref*r_sim(k);
-end
-
-i_sim = i_e + delta_i_sim;
-
-figure;
-plot(t_sim, i_sim, 'LineWidth', 1.5);
-grid on;
-title('Corrente richiesta dal pole placement');
-xlabel('Time [s]');
-ylabel('i_{ref} [A]');
-
-fprintf('\nCorrente di equilibrio i_e = %.6f A\n', i_e);
-fprintf('Corrente minima richiesta = %.6f A\n', min(i_sim));
-fprintf('Corrente massima richiesta = %.6f A\n', max(i_sim));
-
-if max(i_sim) > I_max
-    warning('La corrente richiesta supera I_max. Scegli poli piu'' lenti o riduci lo step di riferimento.')
-end
-
-if min(i_sim) < 0
-    warning('La corrente richiesta diventa negativa. Verifica riferimento, segni e saturazioni.')
-end
 
