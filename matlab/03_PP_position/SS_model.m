@@ -63,8 +63,8 @@ fprintf("amplificatore: Kg=%f\n", Kg);
 
 % 1.2) Regolatore RL sintetizzato in frequenza
 fprintf(' 1.2) REGOLATORE DI CORRENTE R_i(s)\n');
-Kp_i = 14.559055;
-Ki_i = 330.005238;
+Kp_i = 72.795273;
+Ki_i = 1650.026190;
 fprintf("Kp_i = %f\n", Kp_i);
 fprintf("Ki_i = %f\n", Ki_i);
 
@@ -127,7 +127,7 @@ else
     disp('The linearized model is not observable');
 end
 
-%% 3) Luenberger Observer con Ackermann
+%% 3) State Observer con Ackermann
 fprintf(' 3) LUENBERGER OBSERVER - ACKERMANN\n');
 % Poli desiderati dell'osservatore
 p_obs = [-150 -180];
@@ -150,7 +150,99 @@ B_obs = [B_x L_obs];
 C_obs = eye(2);
 D_obs = zeros(2,2);
 
+E_obs = eye(2);
+
 SS_obs = ss(A_obs, B_obs, C_obs, D_obs);
 
 fprintf('\nModello state-space osservatore:\n');
 SS_obs
+
+%% 4) Pole Placement controller con Ackermann
+fprintf(' 4) POLE PLACEMENT CONTROLLER - ACKERMANN\n');
+% Verifica controllabilità
+Mr_pp = ctrb(A_x, B_x);
+
+if rank(Mr_pp) == size(A_x,1)
+    disp('Il sistema meccanico linearizzato e'' controllabile, pole placement possibile')
+else
+    error('Il sistema non e'' controllabile: pole placement non possibile')
+end
+
+% 4.1) Poli desiderati del controllore
+% Devono essere più lenti dei poli dell'osservatore.
+% Esempio conservativo per non chiedere troppa corrente:
+p_ctrl = [-20 -25];
+
+% 4.2) Guadagno di stato
+%K_pp = acker(A_x, B_x, p_ctrl);
+K_pp = place(A_x, B_x, p_ctrl);
+
+fprintf('\nGuadagno di stato K_pp:\n');
+disp(K_pp);
+
+% 4.3) Verifica dei poli in anello chiuso
+A_cl_pp = A_x - B_x*K_pp;
+eig_cl_pp = eig(A_cl_pp);
+
+fprintf('Poli ottenuti con pole placement:\n');
+disp(eig_cl_pp);
+
+% Sistema in anello chiuso da delta_x_ref a delta_y
+SS_cl_pp = ss(A_cl_pp, B_x, C_x, D_x);
+
+% 4.4) Guadagno statico di scaling
+Kdc = dcgain(SS_cl_pp);
+K_ref = 1/Kdc;
+
+fprintf('Guadagno reference:\n');
+disp(K_ref);
+
+
+
+% Risposta al gradino sul riferimento di posizione linearizzato
+% Esempio: step di 1 mm attorno al punto di equilibrio
+delta_x_ref_step = 1e-3;
+
+figure;
+step(delta_x_ref_step * SS_cl_pp);
+grid on;
+title('Pole Placement - risposta a step di riferimento posizione');
+xlabel('Time [s]');
+ylabel('\Delta x [m]');
+
+% Controllo dello sforzo di corrente richiesto
+% Simulo la risposta e calcolo:
+%   delta_i = -K_pp*x + Nbar*delta_x_ref
+t_sim = 0:0.001:2;
+r_sim = delta_x_ref_step * ones(size(t_sim));
+
+[y_sim, t_sim, x_sim] = lsim(SS_cl_pp, r_sim, t_sim);
+
+delta_i_sim = zeros(length(t_sim),1);
+
+for k = 1:length(t_sim)
+    xk = x_sim(k,:)';
+    delta_i_sim(k) = -K_pp*xk + K_ref*r_sim(k);
+end
+
+i_sim = i_e + delta_i_sim;
+
+figure;
+plot(t_sim, i_sim, 'LineWidth', 1.5);
+grid on;
+title('Corrente richiesta dal pole placement');
+xlabel('Time [s]');
+ylabel('i_{ref} [A]');
+
+fprintf('\nCorrente di equilibrio i_e = %.6f A\n', i_e);
+fprintf('Corrente minima richiesta = %.6f A\n', min(i_sim));
+fprintf('Corrente massima richiesta = %.6f A\n', max(i_sim));
+
+if max(i_sim) > I_max
+    warning('La corrente richiesta supera I_max. Scegli poli piu'' lenti o riduci lo step di riferimento.')
+end
+
+if min(i_sim) < 0
+    warning('La corrente richiesta diventa negativa. Verifica riferimento, segni e saturazioni.')
+end
+

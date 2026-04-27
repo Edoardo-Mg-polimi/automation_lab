@@ -91,7 +91,7 @@ wm = abs(p(1));
 fprintf("Frequenza naturale G_x: wm=%f", wm);
 
 %% 3) BODE syntesis 
-wc = 2*wm;
+wc = 10*wm;
 phase_m = 90; %margine di fase in deg
 fprintf("Requirements: wc=%f , phase margin=%f \n", wc, phase_m);
 
