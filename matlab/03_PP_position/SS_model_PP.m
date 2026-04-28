@@ -91,6 +91,7 @@ fprintf(' 2) MODELLO MECCANICO LINEARIZZATO\n');
 x_e = l/2 - r; % posizione di equilibrio a metà (piedistallo - inizio palla)
 xd_e = 0;
 i_e = sqrt((m*g/km) * (x_e + 2*r -l)^2); % corrente di equilibrio ie(xe)
+X0 = [x_e; xd_e; i_e];
 
 v_e = i_e * R;
 
@@ -172,7 +173,7 @@ end
 % 4.1) Poli desiderati del controllore
 % Devono essere più lenti dei poli dell'osservatore.
 % Esempio conservativo per non chiedere troppa corrente:
-p_ctrl = [-20 -25];
+p_ctrl = [-70 -75];
 
 % 4.2) Guadagno di stato
 %K_pp = acker(A_x, B_x, p_ctrl);

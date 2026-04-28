@@ -61,8 +61,10 @@ title('Nyquist G_i(s) circuito RL')
 % 1.2) REGOLATORE RL
 fprintf(' 1.2) REGOLATORE DI CORRENTE R_i(s)\n');
 % Sintesi con metodo di BODE
-Kp_i = 14.559055;
-Ki_i = 330.005238;
+% Kp_i = 14.559055;
+% Ki_i = 330.005238;
+Kp_i = 72.795273;
+Ki_i = 1650.026190;
 fprintf("Kp_i = %f\n", Kp_i);
 fprintf("Ki_i = %f\n", Ki_i);
 
@@ -142,6 +144,25 @@ figure
 nyquist(G)
 grid on
 title('Diagramma di Nyquist di G')
+
+%% Position Controller
+% Kp_x = 350;
+% Ki_x = 50;
+% Kd_x = 3.5;
+% Tf_x = 0.01;
+% 
+% C_x = Kp_x + Ki_x/s + Kd_x*s/(Tf_x*s + 1);
+
+%C_x = 1.4321e05*(s+49.93)*(s+0.1431) / (s*(s+1.718e04));
+C_x = 2e3*(s+40)*(s+0.3)/(s*(s+700));
+
+sisotool(G, C_x)
+
+L_x = C_x*G;
+H_x = L_x/(1+L_x);
+H_x = minreal(H_x);
+
+poles_H_x = pole(H_x)
 
 
 
