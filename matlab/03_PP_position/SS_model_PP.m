@@ -83,8 +83,8 @@ fprintf("Gain margin=%f ,Phase margin=%f ,w_c=%f \n", gm, pm, wcp_i);
 % 1.4) Anello chiuso di corrente
 fprintf(' 1.4) ANELLO CHIUSO CORRENTE H_i(s)\n');
 H_i = minreal(L_i/(1+L_i))
-poles_H_i = pole(H_i);
-
+pole_H_i = pole(H_i);
+w_i = abs(pole_H_i);
 %% 2) Modello meccanico linearizzato
 fprintf(' 2) MODELLO MECCANICO LINEARIZZATO\n');
 %Equilibrium
@@ -128,31 +128,79 @@ else
     disp('The linearized model is not observable');
 end
 
-%% 3) State Observer con Ackermann
-fprintf(' 3) LUENBERGER OBSERVER - ACKERMANN\n');
+%% 2.3) Modello esteso meccanica + anello chiuso corrente
+fprintf(' 2.3) MODELLO ESTESO MECCANICA + CORRENTE\n');
+
+% Stati:
+% x_ext = [delta_x; delta_xdot; delta_i]
+%
+% Ingresso:
+% u_ext = delta_i_ref
+%
+% Uscite misurate:
+% y_ext = [delta_x; delta_i]
+
+A_ext = [0    1      0;
+         k1   0      k2;
+         0    0     -w_i];
+
+B_ext = [0;
+         0;
+         w_i];
+
+C_ext = [1 0 0;
+         0 0 1];
+
+C_pos_ext = [1 0 0];
+
+D_ext = zeros(2,1);
+
+fprintf('Autovalori modello esteso aperto:\n');
+disp(eig(A_ext));
+
+% Controllabilità modello esteso
+Mr_ext = ctrb(A_ext, B_ext);
+
+if rank(Mr_ext) == size(A_ext,1)
+    disp('Il modello esteso è controllabile')
+else
+    error('Il modello esteso non è controllabile')
+end
+
+% Osservabilità modello esteso
+Mo_ext = obsv(A_ext, C_ext);
+
+if rank(Mo_ext) == size(A_ext,1)
+    disp('Il modello esteso è osservabile')
+else
+    error('Il modello esteso non è osservabile')
+end
+
+%% 3) State Observer
+fprintf(' 3) LUENBERGER OBSERVER\n');
 % Poli desiderati dell'osservatore
-p_obs = [-150 -180];
+p_obs = [-350 -375 -800];
 
 % Guadagno osservatore con formula di Ackermann
-L_obs = acker(A_x', C_x', p_obs)';
+L_obs = place(A_ext', C_ext', p_obs)';
 
 
 fprintf('\nGuadagno osservatore L_obs:\n');
 disp(L_obs);
 
 % Verifica poli dell'errore di stima
-eig_obs = eig(A_x - L_obs*C_x);
+eig_obs = eig(A_ext - L_obs*C_ext);
 
 fprintf('Poli osservatore:\n');
 disp(eig_obs);
 
 % Modello osservatore
-A_obs = A_x - L_obs*C_x;
-B_obs = [B_x L_obs];
-C_obs = eye(2);
-D_obs = zeros(2,2);
+A_obs = A_ext - L_obs*C_ext;
+B_obs = [L_obs B_ext];
+C_obs = eye(3);
+D_obs = zeros(3,3);
 
-E_obs = eye(2);
+E_obs = eye(3);
 
 SS_obs = ss(A_obs, B_obs, C_obs, D_obs);
 
@@ -161,40 +209,38 @@ SS_obs
 
 %% 4) Pole Placement controller
 fprintf(' 4) POLE PLACEMENT CONTROLLER - ACKERMANN\n');
-% Verifica controllabilità
-Mr_pp = ctrb(A_x, B_x);
 
-if rank(Mr_pp) == size(A_x,1)
-    disp('Il sistema meccanico linearizzato e'' controllabile, pole placement possibile')
+% Verifica controllabilità
+Mr_ext = ctrb(A_ext, B_ext);
+
+if rank(Mr_ext) == size(A_ext,1)
+    disp('Il sistema esteso è controllabile, pole placement possibile')
 else
-    error('Il sistema non e'' controllabile: pole placement non possibile')
+    error('Il sistema esteso non è controllabile')
 end
 
 % 4.1) Poli desiderati del controllore
 % Devono essere più lenti dei poli dell'osservatore.
-% Esempio conservativo per non chiedere troppa corrente:
-p_ctrl = [-70 -75];
+p_ctrl = [-70 -75 pole_H_i];
 
 % 4.2) Guadagno di stato
-%K_pp = acker(A_x, B_x, p_ctrl);
-K_pp = place(A_x, B_x, p_ctrl);
+K_pp = place(A_ext, B_ext, p_ctrl);
 
 fprintf('\nGuadagno di stato K_pp:\n');
 disp(K_pp);
 
 % 4.3) Verifica dei poli in anello chiuso
-A_cl_pp = A_x - B_x*K_pp;
+A_cl_pp = A_ext - B_ext*K_pp;
 eig_cl_pp = eig(A_cl_pp);
 
 fprintf('Poli ottenuti con pole placement:\n');
 disp(eig_cl_pp);
 
 % Sistema in anello chiuso da delta_x_ref a delta_y
-SS_cl_pp = ss(A_cl_pp, B_x, C_x, D_x);
+SS_cl_pp = ss(A_cl_pp, B_ext, C_ext, D_ext);
 
 % 4.4) Guadagno statico di scaling
-Kdc = dcgain(SS_cl_pp);
-K_ref = 1/Kdc;
+K_ref = -1/(C_pos_ext*((A_ext - B_ext*K_pp)\B_ext));
 
 fprintf('Guadagno reference:\n');
 disp(K_ref);
