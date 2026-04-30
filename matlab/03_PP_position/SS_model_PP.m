@@ -245,5 +245,59 @@ K_ref = -1/(C_pos_ext*((A_ext - B_ext*K_pp)\B_ext));
 fprintf('Guadagno reference:\n');
 disp(K_ref);
 
+%% 5) PP with integral action
+fprintf(' 5) POLE PLACEMENT CONTROLLER WITH INTEGRAL ACTION\n');
+
+% 5.1) extend the system
+n = size(A_ext,1);
+
+% Stato integrale:
+% xi_dot = delta_x_ref - delta_x = r - C_pos_ext*x
+
+A_aug = [A_ext              zeros(n,1);
+        -C_pos_ext          0];
+
+B_aug = [B_ext;
+         0];
+
+Br_aug = [zeros(n,1);
+          1];
+
+C_aug = [C_pos_ext 0];
+
+% 5.2) Verifica controllabilità sistema aumentato
+Mr_aug = ctrb(A_aug, B_aug);
+
+if rank(Mr_aug) == size(A_aug,1)
+    disp('Il sistema aumentato è controllabile, pole placement possibile')
+else
+    error('Il sistema aumentato NON è controllabile')
+end
+
+% 5.3) 
+p_int = -10;% polo associato ad azione integrale
+p_ctrl_aug = [-70 -75 p_int -w_i];
+
+K_aug = place(A_aug, B_aug, p_ctrl_aug);
+
+Kx = K_aug(1:n);      % guadagni sugli stati [delta_x, delta_xdot, delta_i]
+Ki = K_aug(end);      % guadagno sullo stato integrale
+
+fprintf('\nGuadagno Kx:\n');
+disp(Kx);
+
+fprintf('Guadagno Ki:\n');
+disp(Ki);
+
+A_cl_aug = A_aug - B_aug*K_aug;
+
+fprintf('Poli ottenuti con pole placement aumentato:\n');
+disp(eig(A_cl_aug));
+
+% 5.4) Sistema chiuso
+SS_cl_aug = ss(A_cl_aug, Br_aug, C_aug, 0);
+
+
+
 
 
