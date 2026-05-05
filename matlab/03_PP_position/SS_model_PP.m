@@ -207,7 +207,7 @@ SS_obs = ss(A_obs, B_obs, C_obs, D_obs);
 fprintf('\nModello state-space osservatore:\n');
 SS_obs
 
-%% 4) Pole Placement controller
+%% 4) Pole Placement controller a 3 stati
 fprintf(' 4) POLE PLACEMENT CONTROLLER - ACKERMANN\n');
 
 % Verifica controllabilità
@@ -245,7 +245,7 @@ K_ref = -1/(C_pos_ext*((A_ext - B_ext*K_pp)\B_ext));
 fprintf('Guadagno reference:\n');
 disp(K_ref);
 
-%% 5) PP with integral action
+%% 5) PP + Integral action
 fprintf(' 5) POLE PLACEMENT CONTROLLER WITH INTEGRAL ACTION\n');
 
 % 5.1) extend the system
@@ -274,7 +274,7 @@ else
     error('Il sistema aumentato NON è controllabile')
 end
 
-% 5.3) 
+% 5.3) Requirement
 p_int = -10;% polo associato ad azione integrale
 p_ctrl_aug = [-70 -75 p_int -w_i];
 

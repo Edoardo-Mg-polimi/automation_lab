@@ -83,7 +83,8 @@ fprintf("Gain margin=%f ,Phase margin=%f ,w_c=%f \n", gm, pm, wcp_i);
 % 1.4) Anello chiuso di corrente
 fprintf(' 1.4) ANELLO CHIUSO CORRENTE H_i(s)\n');
 H_i = minreal(L_i/(1+L_i))
-poles_H_i = pole(H_i);
+pole_H_i = pole(H_i);
+w_i = abs(pole_H_i);
 
 %% 2) Modello meccanico linearizzato
 fprintf(' 2) MODELLO MECCANICO LINEARIZZATO\n');
@@ -127,87 +128,151 @@ else
     disp('The linearized model is not observable');
 end
 
+%% 2.3) Modello esteso meccanica + anello chiuso corrente
+fprintf(' 2.3) MODELLO ESTESO MECCANICA + CORRENTE\n');
+
+% Stati:
+% x_ext = [delta_x; delta_xdot; delta_i]
+%
+% Ingresso:
+% u_ext = delta_i_ref
+%
+% Uscite misurate:
+% y_ext = [delta_x; delta_i]
+
+A_ext = [0    1      0;
+         k1   0      k2;
+         0    0     -w_i];
+
+B_ext = [0;
+         0;
+         w_i];
+
+C_ext = [1 0 0;
+         0 0 1];
+
+C_pos_ext = [1 0 0];
+
+D_ext = zeros(2,1);
+
+fprintf('Autovalori modello esteso aperto:\n');
+disp(eig(A_ext));
+
+% Controllabilità modello esteso
+Mr_ext = ctrb(A_ext, B_ext);
+
+if rank(Mr_ext) == size(A_ext,1)
+    disp('Il modello esteso è controllabile')
+else
+    error('Il modello esteso non è controllabile')
+end
+
+% Osservabilità modello esteso
+Mo_ext = obsv(A_ext, C_ext);
+
+if rank(Mo_ext) == size(A_ext,1)
+    disp('Il modello esteso è osservabile')
+else
+    error('Il modello esteso non è osservabile')
+end
+
 %% 3) Kalman Filter per stima dello stato
 fprintf(' 3) KALMAN FILTER - LQE\n');
 
-% Modello:
-%   x_dot = A_x*x + B_x*u + G_kf*w
-%   y     = C_x*x + v
-%
-% Stato:
-%   x = [delta_posizione; delta_velocita]
+% Stati:
+% x = [delta_x; delta_xdot; delta_i]
 %
 % Ingresso:
-%   u = delta_i, variazione di corrente rispetto all'equilibrio
+% u = delta_i_ref
 %
-% Misura:
-%   y = delta_posizione
+% Misure:
+% y = [delta_x_meas; delta_i_meas]
 
-% Disturbo di processo: lo modello come disturbo sull'accelerazione
-G_kf = [0; 1];
+% Matrice di misura del sistema
+C_meas = [1 0 0;
+          0 0 1];
 
-% Covarianza rumore di processo
-% Valore iniziale da tarare: più è grande, più il filtro segue la misura
-sigma_a = 5;               % [m/s^2], incertezza equivalente sull'accelerazione
-Q_kf = sigma_a^2;
+% Disturbi di processo:
+% w1 = disturbo equivalente sull'accelerazione
+% w2 = disturbo equivalente sulla dinamica di corrente
+G_kf = [0 0;
+        1 0;
+        0 1];
 
-% Covarianza rumore di misura
-% Se y è in metri, questo è il rumore stimato del sensore di posizione
-sigma_y = 0.10e-3;         % [m], es. 0.10 mm
-R_kf = sigma_y^2;
+% taratura 1: incertezza sul modello
+sigma_a = 20;       % [m/s^2], incertezza sull'accelerazione
+sigma_i = 0.05;    % [A/s], incertezza equivalente sulla dinamica corrente
 
-% Guadagno di Kalman continuo
-[L_kf, P_kf, eig_kf] = lqe(A_x, G_kf, C_x, Q_kf, R_kf);
+Q_kf = diag([sigma_a^2, sigma_i^2]);
+
+% taratura 2: incertezza sulle misurazioni
+sigma_yx = 0.1e-3;  % [m], rumore sensore posizione
+sigma_yi = 0.01;     % [A], rumore sensore corrente
+
+R_kf = diag([sigma_yx^2, sigma_yi^2]);
+
+% Guadagno Kalman continuo
+[L_kf, P_kf, eig_kf] = lqe(A_ext, G_kf, C_meas, Q_kf, R_kf);
 
 fprintf('\nGuadagno Kalman L_kf:\n');
 disp(L_kf);
 
 fprintf('Poli del filtro di Kalman:\n');
-disp(eig(A_x - L_kf*C_x));
+disp(eig_kf);
+
+% Oppure, equivalente:
+disp(eig(A_ext - L_kf*C_meas));
 
 % Modello del filtro:
-%   xhat_dot = A_x*xhat + B_x*u + L_kf*(y - C_x*xhat)
+% xhat_dot = A_ext*xhat + B_ext*u + L_kf*(y - C_meas*xhat)
 %
-% Forma State Space:
-%   xhat_dot = (A_x - L_kf*C_x)*xhat + [B_x  L_kf]*[u; y]
-%   output   = xhat
+% quindi:
+% xhat_dot = (A_ext - L_kf*C_meas)*xhat + [B_ext L_kf]*[u; y]
+%
+% ingressi filtro:
+% input 1 = delta_i_ref
+% input 2 = delta_x_meas
+% input 3 = delta_i_meas
+%
+% uscite filtro:
+% output = [delta_x_hat; delta_xdot_hat; delta_i_hat]
 
-A_kf = A_x - L_kf*C_x;
-B_kf = [B_x L_kf];
-C_kf = eye(2);
-D_kf = zeros(2,2);
+A_kf = A_ext - L_kf*C_meas;
+B_kf = [L_kf B_ext];
 
-E_kf = eye(2);
+C_kf = eye(3);
+D_kf = zeros(3,3);
 
 SS_kf = ss(A_kf, B_kf, C_kf, D_kf);
 
 fprintf('\nModello state-space Kalman Filter:\n');
 SS_kf
-
-%% 4) LQ / LQR Controller
+%% 4) LQ / LQR Controller a 3 stati
 fprintf(' 4) LQ CONTROLLER - LQR\n');
 
 % Verifica controllabilità
-Mr_lq = ctrb(A_x, B_x);
+Mr_ext = ctrb(A_ext, B_ext);
 
-if rank(Mr_lq) == size(A_x,1)
-    disp('Il sistema meccanico linearizzato e'' controllabile, LQR possibile')
+if rank(Mr_ext) == size(A_ext,1)
+    disp('Il sistema esteso è controllabile, pole placement possibile')
 else
-    error('Il sistema non e'' controllabile: LQR non possibile')
+    error('Il sistema esteso non è controllabile')
 end
 
 % 4.1) Scelta dei pesi LQ
-% Stato: x = [delta_posizione; delta_velocita]
-% Ingresso: delta_i, variazione di corrente rispetto alla corrente di equilibrio
-
-% Valori massimi "accettabili" usati per normalizzare i pesi
-delta_x_max  = 2e-3;   % [m] errore posizione ammesso, es. 2 mm
-delta_xd_max = 0.10;   % [m/s] velocita' ammessa
-delta_i_max  = 0.50;   % [A] variazione corrente ammessa
+% Stato: x = [posizione; velocita; corrente]
 
 % Bryson rule: peso = 1 / valore_massimo^2
-Q_lq = diag([1/delta_x_max^2, 1/delta_xd_max^2]);
-R_lq = 1/delta_i_max^2;
+delta_x_max  = 1.5e-3;   % [m]
+delta_xd_max = 0.05;   % [m/s]
+
+delta_iref_max = 1.5; % [A]
+
+Q_lq = diag([1/delta_x_max^2, ...
+               1/delta_xd_max^2, ...
+               0]);
+
+R_lq = 1/delta_iref_max^2;
 
 fprintf('\nMatrice Q_lq:\n');
 disp(Q_lq);
@@ -216,33 +281,102 @@ fprintf('Matrice R_lq:\n');
 disp(R_lq);
 
 % 4.2) Guadagno LQR
-K_lq = lqr(A_x, B_x, Q_lq, R_lq);
+K_lq = lqr(A_ext, B_ext, Q_lq, R_lq);
 
 fprintf('\nGuadagno di stato K_lq:\n');
 disp(K_lq);
 
 % 4.3) Verifica dei poli in anello chiuso
-A_cl_lq = A_x - B_x*K_lq;
+A_cl_lq = A_ext - B_ext*K_lq;
 eig_cl_lq = eig(A_cl_lq);
 
 fprintf('Poli ottenuti con LQR:\n');
 disp(eig_cl_lq);
 
 % Sistema in anello chiuso da delta_x_ref a delta_y
-SS_cl_lq = ss(A_cl_lq, B_x, C_x, D_x);
+SS_cl_lq = ss(A_cl_lq, B_ext, C_ext, D_ext);
 
 % 4.4) Guadagno statico di scaling per inseguimento riferimento
-Kdc = dcgain(SS_cl_lq);
-K_ref = 1/Kdc;
+K_ref = -1/(C_pos_ext*((A_ext - B_ext*K_lq)\B_ext));
+
 
 fprintf('Guadagno reference K_ref:\n');
 disp(K_ref);
 
-% Formula equivalente, utile da confrontare:
-Nbar_lq = -1/(C_x*((A_x - B_x*K_lq)\B_x));
 
-fprintf('Prefiltro Nbar_lq:\n');
-disp(Nbar_lq);
+%% 5) LQR + Integral action
+fprintf(' 5) LQR + Integral action \n');
+
+% 5.1) extend the system
+n = size(A_ext,1);
+
+% Stato integrale:
+% xi_dot = delta_x_ref - delta_x = r - C_pos_ext*x
+
+A_aug = [A_ext              zeros(n,1);
+        -C_pos_ext          0];
+
+B_aug = [B_ext;
+         0];
+
+Br_aug = [zeros(n,1);
+          1];
+
+C_aug = [C_pos_ext 0];
+
+% 5.2) Verifica controllabilità sistema aumentato
+Mr_aug = ctrb(A_aug, B_aug);
+
+if rank(Mr_aug) == size(A_aug,1)
+    disp('Il sistema aumentato è controllabile, pole placement possibile')
+else
+    error('Il sistema aumentato NON è controllabile')
+end
+
+% 5.3) Scelta dei pesi LQI
+% Stato aumentato:
+% x_aug = [delta_x; delta_xdot; delta_i; xi]
+%
+% xi = integrale dell'errore di posizione
+% xi_dot = delta_x_ref - delta_x
+
+
+% gli altri parametri sono stati tarati prima
+delta_xi_max     = 3e-3;    % [m*s], tara l'azione integrale
+
+
+Q_aug = diag([1/delta_x_max^2, ...
+              1/delta_xd_max^2, ...
+              0, ...
+              1/delta_xi_max^2]);
+
+R_aug = 1/delta_iref_max^2;
+
+fprintf('\nMatrice Q_aug:\n');
+disp(Q_aug);
+
+fprintf('Matrice R_aug:\n');
+disp(R_aug);
+
+% 5.4) Guadagno LQR con azione integrale
+K_aug = lqr(A_aug, B_aug, Q_aug, R_aug);
+
+% Separazione dei guadagni
+Kx_lqi = K_aug(1:n);     % feedback sugli stati [x, xdot, i]
+Ki_lqi = K_aug(end);     % feedback sullo stato integrale xi
+
+fprintf('\nGuadagno aumentato K_aug:\n');
+disp(K_aug);
+
+fprintf('Guadagno sugli stati Kx_lqi:\n');
+disp(Kx_lqi);
+
+fprintf('Guadagno integrale Ki_lqi:\n');
+disp(Ki_lqi);
+
+% Legge di controllo:
+% delta_i_ref = -Kx_lqi*x_hat - Ki_lqi*xi
+
 
 
 
