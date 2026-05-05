@@ -39,6 +39,7 @@ s = tf('s');
 wp = R/L;% unico polo di T(s) calcolabile anche con funzione pole
 G_i = 1/(s*L +R)
 [G_i_num, G_i_den]   = tfdata(G_i, 'v');
+G_i_num = G_i_num(2);
 
 fprintf("amplificatore: Kg=%f\n", Kg);
 

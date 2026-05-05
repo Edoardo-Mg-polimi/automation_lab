@@ -38,6 +38,7 @@ s = tf('s');
 wp = R/L; % unico polo di G_i(s)
 G_i = 1/(s*L +R)
 [G_i_num, G_i_den] = tfdata(G_i, 'v');
+G_i_num = G_i_num(2);
 
 % Rappresentazione in spazio di stato del RL (solo per verifiche)
 A_i = -R/L;
@@ -148,6 +149,7 @@ B_ext = [0;
          0;
          w_i];
 
+% Come output del sistema: posizione e corrente
 C_ext = [1 0 0;
          0 0 1];
 
@@ -179,28 +181,29 @@ end
 %% 3) State Observer
 fprintf(' 3) LUENBERGER OBSERVER\n');
 % Poli desiderati dell'osservatore
-p_obs = [-350 -375 -800];
+p_obs = [-500 -600];
 
-% Guadagno osservatore con formula di Ackermann
-L_obs = place(A_ext', C_ext', p_obs)';
+% Guadagno osservatore con formula
+L_obs = place(A_x', C_x', p_obs)';
 
 
 fprintf('\nGuadagno osservatore L_obs:\n');
 disp(L_obs);
 
 % Verifica poli dell'errore di stima
-eig_obs = eig(A_ext - L_obs*C_ext);
+eig_obs = eig(A_x - L_obs*C_x);
 
 fprintf('Poli osservatore:\n');
 disp(eig_obs);
 
 % Modello osservatore
-A_obs = A_ext - L_obs*C_ext;
-B_obs = [L_obs B_ext];
-C_obs = eye(3);
-D_obs = zeros(3,3);
+A_obs = A_x - L_obs*C_x;
+B_obs = [L_obs B_x];
+%B_obs = [B_ext L_obs];
+C_obs = eye(2);
+D_obs = zeros(2,2);
 
-E_obs = eye(3);
+E_obs = eye(2);
 
 SS_obs = ss(A_obs, B_obs, C_obs, D_obs);
 
@@ -275,7 +278,7 @@ else
 end
 
 % 5.3) Requirement
-p_int = -10;% polo associato ad azione integrale
+p_int = -5;% polo associato ad azione integrale
 p_ctrl_aug = [-70 -75 p_int -w_i];
 
 K_aug = place(A_aug, B_aug, p_ctrl_aug);

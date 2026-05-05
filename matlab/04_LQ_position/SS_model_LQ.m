@@ -38,6 +38,7 @@ s = tf('s');
 wp = R/L; % unico polo di G_i(s)
 G_i = 1/(s*L +R)
 [G_i_num, G_i_den] = tfdata(G_i, 'v');
+G_i_num = G_i_num(2);
 
 % Rappresentazione in spazio di stato del RL (solo per verifiche)
 A_i = -R/L;
