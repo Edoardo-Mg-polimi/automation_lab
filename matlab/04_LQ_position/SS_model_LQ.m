@@ -202,13 +202,13 @@ G_kf = [0 0;
 
 % taratura 1: incertezza sul modello
 sigma_a = 20;       % [m/s^2], incertezza sull'accelerazione
-sigma_i = 0.05;    % [A/s], incertezza equivalente sulla dinamica corrente
+sigma_i = 5;    % [A/s], incertezza equivalente sulla dinamica corrente
 
 Q_kf = diag([sigma_a^2, sigma_i^2]);
 
 % taratura 2: incertezza sulle misurazioni
 sigma_yx = 0.1e-3;  % [m], rumore sensore posizione
-sigma_yi = 0.01;     % [A], rumore sensore corrente
+sigma_yi = 0.001;     % [A], rumore sensore corrente
 
 R_kf = diag([sigma_yx^2, sigma_yi^2]);
 
@@ -231,10 +231,10 @@ disp(eig(A_ext - L_kf*C_meas));
 % xhat_dot = (A_ext - L_kf*C_meas)*xhat + [B_ext L_kf]*[u; y]
 %
 % ingressi filtro:
-% input 1 = delta_i_ref
-% input 2 = delta_x_meas
-% input 3 = delta_i_meas
-%
+% input 1 = delta_x_meas
+% input 2 = delta_i_meas
+% input 3 = delta_i_ref
+
 % uscite filtro:
 % output = [delta_x_hat; delta_xdot_hat; delta_i_hat]
 
@@ -264,10 +264,10 @@ end
 % Stato: x = [posizione; velocita; corrente]
 
 % Bryson rule: peso = 1 / valore_massimo^2
-delta_x_max  = 1.5e-3;   % [m]
-delta_xd_max = 0.05;   % [m/s]
+delta_x_max  = 2.0e-3;   % [m]
+delta_xd_max = 0.03;   % [m/s]
 
-delta_iref_max = 1.5; % [A]
+delta_iref_max = 1.4; % [A]
 
 Q_lq = diag([1/delta_x_max^2, ...
                1/delta_xd_max^2, ...
@@ -343,7 +343,7 @@ end
 
 
 % gli altri parametri sono stati tarati prima
-delta_xi_max     = 3e-3;    % [m*s], tara l'azione integrale
+delta_xi_max     = 1;    % [m*s], tara l'azione integrale
 
 
 Q_aug = diag([1/delta_x_max^2, ...
@@ -375,9 +375,96 @@ disp(Kx_lqi);
 fprintf('Guadagno integrale Ki_lqi:\n');
 disp(Ki_lqi);
 
-% Legge di controllo:
-% delta_i_ref = -Kx_lqi*x_hat - Ki_lqi*xi
+% 5.5) Check sul sistema finale ad anello chiuso
+fprintf('\n 5.5) CHECK SISTEMA FINALE AD ANELLO CHIUSO - LQI\n');
 
+% Matrice di stato del sistema aumentato in anello chiuso
+%
+% x_aug = [delta_x; delta_xdot; delta_i; xi]
+% u = -K_aug*x_aug
+%
+% xi_dot = delta_x_ref - delta_x
 
+A_cl_lqi = A_aug - B_aug*K_aug;
 
+fprintf('\nMatrice A_cl_lqi:\n');
+disp(A_cl_lqi);
 
+% Poli del sistema finale
+eig_cl_lqi = eig(A_cl_lqi);
+
+fprintf('\nPoli del sistema LQI finale:\n');
+disp(eig_cl_lqi);
+
+% Check stabilità
+if all(real(eig_cl_lqi) < 0)
+    disp('Il sistema LQI finale è asintoticamente stabile');
+else
+    warning('Il sistema LQI finale NON è asintoticamente stabile');
+end
+
+% Sistema chiuso da riferimento di posizione a posizione
+SS_cl_lqi = ss(A_cl_lqi, Br_aug, C_aug, 0);
+
+fprintf('\nSistema chiuso LQI da delta_x_ref a delta_x:\n');
+SS_cl_lqi
+
+% Guadagno statico da riferimento a uscita
+dc_gain_lqi = dcgain(SS_cl_lqi);
+
+fprintf('\nGuadagno statico da delta_x_ref a delta_x:\n');
+disp(dc_gain_lqi);
+
+fprintf('Errore statico teorico per riferimento costante:\n');
+disp(1 - dc_gain_lqi);
+
+% Informazioni sui poli: frequenza naturale e smorzamento
+[wn_lqi, zeta_lqi, p_lqi] = damp(SS_cl_lqi);
+
+fprintf('\nTabella poli LQI:\n');
+
+T_poles_lqi = table(p_lqi, real(p_lqi), imag(p_lqi), wn_lqi, zeta_lqi, ...
+    'VariableNames', {'Pole', 'RealPart', 'ImagPart', 'NaturalFrequency', 'DampingRatio'});
+
+disp(T_poles_lqi);
+
+% Check risposta al gradino sul modello lineare
+delta_x_ref_check = 0.7e-3;   % [m], esempio: riferimento di 0.7 mm
+t_check = linspace(0, 5, 2000);
+
+r_check = delta_x_ref_check * ones(size(t_check));
+
+[y_check, t_out_check, x_aug_check] = lsim(SS_cl_lqi, r_check, t_check, zeros(n+1,1));
+
+fprintf('\nRiferimento usato per il check:\n');
+disp(delta_x_ref_check);
+
+fprintf('Valore finale simulato di delta_x:\n');
+disp(y_check(end));
+
+fprintf('Errore finale simulato:\n');
+disp(delta_x_ref_check - y_check(end));
+
+% Ricostruzione del comando delta_i_ref richiesto dal controllore
+u_check = -(K_aug * x_aug_check')';
+
+fprintf('\nMassimo delta_i_ref richiesto dal controllore:\n');
+disp(max(u_check));
+
+fprintf('Minimo delta_i_ref richiesto dal controllore:\n');
+disp(min(u_check));
+
+% Corrente assoluta richiesta: i_ref = i_e + delta_i_ref
+i_ref_abs_check = i_e + u_check;
+
+fprintf('\nMassima corrente assoluta richiesta i_ref:\n');
+disp(max(i_ref_abs_check));
+
+fprintf('Minima corrente assoluta richiesta i_ref:\n');
+disp(min(i_ref_abs_check));
+
+if max(i_ref_abs_check) > I_max || min(i_ref_abs_check) < 0
+    warning('La corrente richiesta supera i limiti fisici: possibile saturazione nel modello non lineare o in Simulink');
+else
+    disp('La corrente richiesta resta nei limiti fisici impostati');
+end
