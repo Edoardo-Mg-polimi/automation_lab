@@ -278,7 +278,7 @@ else
 end
 
 % 5.3) Requirement
-p_int = -5;% polo associato ad azione integrale
+p_int = -3;% polo associato ad azione integrale
 p_ctrl_aug = [-70 -75 p_int -w_i];
 
 K_aug = place(A_aug, B_aug, p_ctrl_aug);

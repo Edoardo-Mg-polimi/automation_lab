@@ -265,9 +265,9 @@ end
 
 % Bryson rule: peso = 1 / valore_massimo^2
 delta_x_max  = 2.0e-3;   % [m]
-delta_xd_max = 0.03;   % [m/s]
+delta_xd_max = 0.05;   % [m/s]
 
-delta_iref_max = 1.4; % [A]
+delta_iref_max = 1.5; % [A]
 
 Q_lq = diag([1/delta_x_max^2, ...
                1/delta_xd_max^2, ...
@@ -343,7 +343,7 @@ end
 
 
 % gli altri parametri sono stati tarati prima
-delta_xi_max     = 1;    % [m*s], tara l'azione integrale
+delta_xi_max     = 0.0005;    % [m*s], diminuire pr aumentare l'azione integrale
 
 
 Q_aug = diag([1/delta_x_max^2, ...
@@ -428,43 +428,55 @@ T_poles_lqi = table(p_lqi, real(p_lqi), imag(p_lqi), wn_lqi, zeta_lqi, ...
 
 disp(T_poles_lqi);
 
-% Check risposta al gradino sul modello lineare
-delta_x_ref_check = 0.7e-3;   % [m], esempio: riferimento di 0.7 mm
-t_check = linspace(0, 5, 2000);
 
-r_check = delta_x_ref_check * ones(size(t_check));
+% ) Margini di stabilità del loop LQI
+%
+% ATTENZIONE:
+% I margini di fase e di guadagno non si calcolano sul sistema chiuso
+% da riferimento a uscita, ma sulla funzione d'anello aperta.
+%
+% Sistema aumentato aperto:
+% x_aug_dot = A_aug*x_aug + B_aug*u
+%
+% Controllore LQI:
+% u = -K_aug*x_aug
+%
+% Quindi la funzione d'anello è:
+% L(s) = K_aug * (sI - A_aug)^(-1) * B_aug
+%
+% MATLAB assume retroazione negativa nella funzione margin(),
+% quindi NON bisogna mettere il segno meno davanti a K_aug.
 
-[y_check, t_out_check, x_aug_check] = lsim(SS_cl_lqi, r_check, t_check, zeros(n+1,1));
+L_lqi = ss(A_aug, B_aug, K_aug, 0);
 
-fprintf('\nRiferimento usato per il check:\n');
-disp(delta_x_ref_check);
+% Semplificazione numerica, utile se ci sono cancellazioni quasi esatte
+L_lqi = minreal(L_lqi);
 
-fprintf('Valore finale simulato di delta_x:\n');
-disp(y_check(end));
+fprintf('\nFunzione d anello LQI L(s):\n');
+L_lqi
 
-fprintf('Errore finale simulato:\n');
-disp(delta_x_ref_check - y_check(end));
+% Calcolo margini
+[GM_lqi, PM_lqi, Wcg_lqi, Wcp_lqi] = margin(L_lqi);
 
-% Ricostruzione del comando delta_i_ref richiesto dal controllore
-u_check = -(K_aug * x_aug_check')';
+% Gain margin in dB
+GMdB_lqi = 20*log10(GM_lqi);
 
-fprintf('\nMassimo delta_i_ref richiesto dal controllore:\n');
-disp(max(u_check));
+fprintf('\nMargini di stabilità LQI:\n');
 
-fprintf('Minimo delta_i_ref richiesto dal controllore:\n');
-disp(min(u_check));
-
-% Corrente assoluta richiesta: i_ref = i_e + delta_i_ref
-i_ref_abs_check = i_e + u_check;
-
-fprintf('\nMassima corrente assoluta richiesta i_ref:\n');
-disp(max(i_ref_abs_check));
-
-fprintf('Minima corrente assoluta richiesta i_ref:\n');
-disp(min(i_ref_abs_check));
-
-if max(i_ref_abs_check) > I_max || min(i_ref_abs_check) < 0
-    warning('La corrente richiesta supera i limiti fisici: possibile saturazione nel modello non lineare o in Simulink');
+if isinf(GM_lqi)
+    fprintf('Gain margin: Inf\n');
+    fprintf('Gain margin [dB]: Inf\n');
 else
-    disp('La corrente richiesta resta nei limiti fisici impostati');
+    fprintf('Gain margin: %.6f\n', GM_lqi);
+    fprintf('Gain margin [dB]: %.6f dB\n', GMdB_lqi);
 end
+
+fprintf('Phase margin: %.6f deg\n', PM_lqi);
+fprintf('Frequenza phase crossover Wcg: %.6f rad/s\n', Wcg_lqi);
+fprintf('Frequenza gain crossover Wcp: %.6f rad/s\n', Wcp_lqi);
+
+% Plot dei margini
+figure;
+margin(L_lqi);
+grid on;
+title('Margini di stabilità del loop LQI');
