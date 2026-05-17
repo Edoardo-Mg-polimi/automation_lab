@@ -97,3 +97,6 @@ resources/project/Root.type.Files/labels.json
 *.nav
 *.snm
 *.vrb
+
+
+report/report.pdf

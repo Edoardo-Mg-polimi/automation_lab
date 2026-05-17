@@ -1,0 +1,137 @@
+\documentclass[11pt,a4paper]{article}
+
+% =========================
+% Packages
+% =========================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{siunitx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+
+% =========================
+% Page setup
+% =========================
+\geometry{top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm}
+\onehalfspacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\sisetup{per-mode=symbol,detect-all=true}
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{13.6pt}
+\lhead{Magnetic Levitation}
+\rhead{Automation and Control Laboratory}
+\cfoot{\thepage}
+
+\titleformat{\section}{\Large\bfseries}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries}{\thesubsubsection}{0.6em}{}
+
+% =========================
+% Listings setup
+% =========================
+\lstdefinestyle{matlabstyle}{
+    language=Matlab,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue!60!black},
+    commentstyle=\color{green!40!black},
+    stringstyle=\color{red!60!black},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=8pt,
+    frame=single,
+    breaklines=true,
+    tabsize=4,
+    captionpos=b
+}
+
+% =========================
+% Useful commands
+% =========================
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\ee}{\mathrm{e}}
+\newcommand{\figref}[1]{Fig.~\ref{#1}}
+\newcommand{\tabref}[1]{Table~\ref{#1}}
+\newcommand{\eqnref}[1]{Eq.~\eqref{#1}}
+
+\begin{document}
+
+% =========================
+% Title page
+% =========================
+\begin{titlepage}
+    \centering
+    \vspace*{1.5cm}
+
+    {\Huge\bfseries Magnetic Levitation\par}
+    \vspace{0.4cm}
+    {\Large Automation and Control Laboratory\par}
+    \vspace{1.2cm}
+    {\large Politecnico di Milano\par}
+    \vspace{2.0cm}
+
+    \begin{tabular}{>{\bfseries}l l}
+        Group members: & Ángela Vallellano Borrero \\
+                       & Giuseppe Sacchi \\
+                       & Riccardo Tittarelli \\
+                       & Edoardo Menegotto \\
+    \end{tabular}
+
+    \vfill
+
+    {\large Academic Year 2025/2026\par}
+    \vspace{0.2cm}
+    {\large \par}
+\end{titlepage}
+
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+\pagenumbering{arabic}
+
+\input{sections/01_introduction}
+\input{sections/02_system_model}
+\input{sections/03_open_loop_analysis}
+\input{sections/04_control_specifications}
+\input{sections/05_FB_control}
+\input{sections/06_PP_control}
+\input{sections/07_LQR_control}
+%\input{sections/08_critical_analysis}
+%\input{sections/09_conclusions}
+
+\newpage
+\begin{thebibliography}{9}
+
+\bibitem{quanser_maglev}
+Quanser Inc., \textit{MAGLEV User Manual: Magnetic Levitation Experiment, Set Up and Configuration}, 2012.
+
+\bibitem{quanser_q2usb}
+Quanser Inc., \textit{Q2-USB User Manual: Data Acquisition Board, Set Up and Configuration}, 2012.
+
+\bibitem{quanser_voltpaq}
+Quanser Inc., \textit{VoltPAQ-X1 Amplifier User Manual, Set Up and Configuration}, 2012.
+
+\bibitem{course_slides}
+A. La Bella, \textit{Automation and Control Laboratory}, Politecnico di Milano, AY 2025/2026.
+
+\end{thebibliography}
+
+\end{document}

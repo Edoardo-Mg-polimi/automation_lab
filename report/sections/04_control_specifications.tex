@@ -1,0 +1,40 @@
+\section{Control system specifications}
+
+\subsection{Self-given specifications for the closed-loop system}
+
+The closed-loop specifications are defined by considering the physical limits of the setup and the objective of obtaining a safe, repeatable and robust levitation. The specifications are used as design targets for all controllers, so that the different strategies can be compared on common criteria.
+
+The main specifications are:
+\begin{itemize}[leftmargin=1.2cm]
+    \item stability around the selected equilibrium point;
+    \item limited overshoot in the ball position response;
+    \item settling time compatible with the mechanical dynamics of the plant;
+    \item steady-state error close to zero for step references;
+    \item acceptable control effort, without sustained current saturation;
+    \item robust behavior under measurement noise and modelling errors;
+    \item safe implementation on the real setup.
+\end{itemize}
+
+\subsection{Performance indices}
+
+For step responses, the following indices are considered:
+\begin{equation}
+    M_p = \frac{x_{max}-x_{ref}}{x_{ref}}\cdot 100,
+\end{equation}
+\begin{equation}
+    e_{ss} = \lim_{t\to\infty} \left(x_{ref}(t)-x(t)\right),
+\end{equation}
+where $M_p$ is the percentage overshoot and $e_{ss}$ is the steady-state error.
+
+For trajectory tracking, the tracking error is
+\begin{equation}
+    e(t) = x_{ref}(t)-x(t),
+\end{equation}
+and the root mean square tracking error is
+\begin{equation}
+    e_{RMS} = \sqrt{\frac{1}{T}\int_0^T e^2(t)\,\dd t}.
+\end{equation}
+
+\subsection{Validation signals}
+
+The controllers are validated using both time-domain and frequency-domain tests. In time domain, step references and sinusoidal references are used. In frequency domain, sinusoidal inputs at selected frequencies are applied to estimate gain and phase and compare the experimental response with the expected model behavior.
