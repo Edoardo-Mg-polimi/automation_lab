@@ -1,6 +1,93 @@
 \section{Frequency-based techniques}
 
 \subsection{EM coil current control}
+\begin{figure}[H]
+    \centering
+    \resizebox{0.95\textwidth}{!}{%
+    \begin{tikzpicture}[
+        auto,
+        node distance=1.2cm and 1.2cm,
+        >=Latex,
+        block/.style={
+            draw,
+            rectangle,
+            minimum width=1.5cm,
+            minimum height=1.0cm,
+            align=center
+        },
+        sum/.style={
+            draw,
+            circle,
+            minimum size=8mm
+        },
+        input/.style={coordinate},
+        output/.style={coordinate},
+        satblock/.style={
+            draw,
+            rectangle,
+            minimum width=2.1cm,
+            minimum height=1.45cm,
+            inner sep=0pt,
+            %label={[font=\scriptsize]below:$\mathrm{sat}(\cdot)$},
+            path picture={
+                % assi centrati in 0
+                \draw[->]
+                    ([xshift=-0.75cm,yshift=0cm]path picture bounding box.center) --
+                    ([xshift= 0.78cm,yshift=0cm]path picture bounding box.center);
+                \draw[->]
+                    ([xshift=0cm,yshift=-0.48cm]path picture bounding box.center) --
+                    ([xshift=0cm,yshift= 0.50cm]path picture bounding box.center);
+                % caratteristica di saturazione centrata in 0
+                \draw[thick]
+                    ([xshift=-0.65cm,yshift=-0.32cm]path picture bounding box.center) --
+                    ([xshift=-0.25cm,yshift=-0.32cm]path picture bounding box.center) --
+                    ([xshift= 0.25cm,yshift= 0.32cm]path picture bounding box.center) --
+                    ([xshift= 0.65cm,yshift= 0.32cm]path picture bounding box.center);
+                % livelli di saturazione
+                \draw[dashed]
+                    ([xshift=-0.68cm,yshift= 0.32cm]path picture bounding box.center) --
+                    ([xshift= 0.68cm,yshift= 0.32cm]path picture bounding box.center);
+                \draw[dashed]
+                    ([xshift=-0.68cm,yshift=-0.32cm]path picture bounding box.center) --
+                    ([xshift= 0.68cm,yshift=-0.32cm]path picture bounding box.center);
+                % etichette
+                \node[font=\tiny, anchor=west] at
+                    ([xshift=0.70cm,yshift= 0.32cm]path picture bounding box.center)
+                    {$+V_{\max}$};
+                \node[font=\tiny, anchor=west] at
+                    ([xshift=0.70cm,yshift=-0.32cm]path picture bounding box.center)
+                    {$-V_{\max}$};
+                \node[font=\tiny, anchor=north east] at
+                    ([xshift=0cm,yshift=0cm]path picture bounding box.center)
+                    {$0$};
+            }
+        },
+        font=\small
+    ]
+    % Nodi
+    \node[input] (input) {};
+    \node[sum, right=of input] (sum) {$+$};
+    \node[block, right=of sum] (controller) {$PI(s)$};
+    \node[block, right=of controller] (amp) {$K_g$};
+    \node[satblock, right=of amp] (sat) {};
+    \node[block, right=of sat] (plant) {$\displaystyle \frac{1}{Ls+R}$};
+    % output più lontano -> freccia più lunga
+    \node[output, right=2.0cm of plant] (output) {};
+    % Connessioni
+    \draw[->] (input) -- node[pos=0.2, above] {$i_{\mathrm{ref}}(t)$} (sum);
+    \draw[->] (sum) -- node[above] {$e_i(t)$} (controller);
+    \draw[->] (controller) -- node[above] {$u_c(t)$} (amp);
+    \draw[->] (amp) -- node[above] {$v_c(t)$} (sat);
+    \draw[->] (sat) -- node[above] {$v_a(t)$} (plant);
+    \draw[->] (plant) -- node[pos=0.6, above] {$i(t)$} (output);
+    % Retroazione
+    \draw[->] (output) |- ++(0,-1.9) -| node[pos=0.95, left] {$-$} (sum);
+    \end{tikzpicture}%
+    }
+    \caption{Current control loop}
+    \label{fig:block_current_control_sat}
+\end{figure}
+
 
 The first control task is the design of an inner current loop. The open-loop transfer function from the amplifier command voltage to the coil current is obtained from the RL model:
 \begin{equation}
