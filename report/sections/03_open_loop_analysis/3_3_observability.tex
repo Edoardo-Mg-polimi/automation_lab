@@ -1,0 +1,21 @@
+\subsection{Observability}
+
+The observability matrix is
+\begin{equation}
+    \mathcal{O} =
+    \begin{bmatrix}
+        C \\
+        CA \\
+        CA^2
+    \end{bmatrix}.
+\end{equation}
+
+The system is observable if
+\begin{equation}
+    \mathrm{rank}(\mathcal{O}) = n.
+\end{equation}
+
+\begin{lstlisting}[style=matlabstyle,caption={Observability check.}]
+Mo = obsv(A_ext, C_ext);
+rank_Mo = rank(Mo);
+\end{lstlisting}

@@ -1,0 +1,17 @@
+\subsection{Controllability}
+
+The controllability matrix is
+\begin{equation}
+    \mathcal{C} = \begin{bmatrix} B & AB & A^2B \end{bmatrix}.
+\end{equation}
+
+The linearized system is controllable if
+\begin{equation}
+    \mathrm{rank}(\mathcal{C}) = n,
+\end{equation}
+where $n$ is the number of states.
+
+\begin{lstlisting}[style=matlabstyle,caption={Controllability check.}]
+Mr = ctrb(A_ext, B_ext);
+rank_Mr = rank(Mr);
+\end{lstlisting}

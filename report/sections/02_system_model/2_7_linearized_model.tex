@@ -1,0 +1,61 @@
+\subsection{Linearized model}
+
+The nonlinear model is linearized around the equilibrium point $\left(x_e,0,i_e,u_e\right)$. Using deviation variables, the linearized model is
+\begin{equation}
+    \Delta\dot{\vect{x}} = A\Delta\vect{x} + B\Delta u,
+    \qquad
+    \Delta y = C\Delta\vect{x} + D\Delta u.
+    \label{eq:linear_ss_general}
+\end{equation}
+
+If the raw electrical dynamics are included, the matrices are
+\begin{equation}
+A =
+\begin{bmatrix}
+0 & 1 & 0 \\
+\dfrac{2g}{x_e} & 0 & -\dfrac{2g}{i_e} \\
+0 & 0 & -\dfrac{R}{L}
+\end{bmatrix},
+\qquad
+B =
+\begin{bmatrix}
+0 \\
+0 \\
+\dfrac{K_g}{L}
+\end{bmatrix}.
+\label{eq:linear_matrices_voltage}
+\end{equation}
+
+If the inner current loop is already closed and $\Delta i_{ref}$ is the input of the outer-loop model, the matrices become
+\begin{equation}
+A =
+\begin{bmatrix}
+0 & 1 & 0 \\
+\dfrac{2g}{x_e} & 0 & -\dfrac{2g}{i_e} \\
+0 & 0 & -\omega_i
+\end{bmatrix},
+\qquad
+B =
+\begin{bmatrix}
+0 \\
+0 \\
+\omega_i
+\end{bmatrix}.
+\label{eq:linear_matrices_current_loop}
+\end{equation}
+
+The measured outputs are position and current:
+\begin{equation}
+    C =
+    \begin{bmatrix}
+        1 & 0 & 0 \\
+        0 & 0 & 1
+    \end{bmatrix},
+    \qquad
+    D =
+    \begin{bmatrix}
+        0 \\
+        0
+    \end{bmatrix}.
+    \label{eq:output_matrix}
+\end{equation}

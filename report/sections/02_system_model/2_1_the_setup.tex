@@ -1,0 +1,86 @@
+\subsection{The setup}
+\begin{figure}[H]
+    \centering
+    \resizebox{0.75\textwidth}{!}{%
+    \begin{tikzpicture}[
+        >=Latex,
+        dim/.style={<->, thick},
+        labelstyle/.style={font=\small},
+        magnet/.style={draw, thick, fill=gray!25},
+        sensor/.style={draw, thick, fill=blue!10},
+        ball/.style={draw, thick, fill=gray!35}
+    ]
+
+    % Coordinate principali
+    \coordinate (base) at (0,0);
+    \coordinate (ball_bottom) at (0,2.2);
+    \coordinate (ball_center) at (0,3.0);
+    \coordinate (ball_top) at (0,3.8);
+    \coordinate (magnet_face) at (0,5.2);
+
+    % Base sensore: bordo superiore allineato con y=0
+    \draw[sensor] (-1.0,-0.30) rectangle (1.0,0);
+    \node[labelstyle, below] at (0,-0.30) {sensore, base $x=0$};
+
+    % Pallina
+    \draw[ball] (ball_center) circle (0.8);
+    \fill (ball_center) circle (1.5pt);
+
+    % Scritte spostate più a destra
+    \node[labelstyle, right] at (1.6,3.00) {centro pallina, $x+r$};
+    \node[labelstyle, right] at (1.6,2.20) {misura sensore, $x$};
+    \node[labelstyle, right] at (1.6,3.80) {sommità pallina, $x+2r$};
+
+    % Elettromagnete
+    \draw[magnet] (-1.1,5.2) rectangle (1.1,5.8);
+    \node[labelstyle, above] at (0,5.8) {elettromagnete};
+    \node[labelstyle, right] at (1.15,5.2) {$l$};
+
+    % Linee tratteggiate di riferimento
+    \draw[dashed] (-1.7,0) -- (1.7,0);
+    \draw[dashed] (-1.7,2.2) -- (1.7,2.2);
+    \draw[dashed] (-1.7,3.0) -- (1.7,3.0);
+    \draw[dashed] (-1.7,3.8) -- (1.7,3.8);
+    \draw[dashed] (-1.7,5.2) -- (1.7,5.2);
+
+    % Quote dimensionali a sinistra
+    \draw[dim] (-1.65,0) -- (-1.65,2.2);
+    \node[labelstyle, left] at (-1.65,1.1) {$x$};
+
+    \draw[dim] (-1.25,2.2) -- (-1.25,3.0);
+    \node[labelstyle, left] at (-1.25,2.6) {$r$};
+
+    \draw[dim] (-1.25,3.0) -- (-1.25,3.8);
+    \node[labelstyle, left] at (-1.25,3.4) {$r$};
+
+    \draw[dim] (-2.0,0) -- (-2.0,5.2);
+    \node[labelstyle, left] at (-2.0,2.6) {$l$};
+
+    % Air gap
+    \draw[dim] (1.75,3.8) -- (1.75,5.2);
+    \node[labelstyle, right, align=left] at (1.75,4.5)
+    {$d(x)$\\$=l-x-2r$};
+
+    % Forze allineate sull'asse centrale della pallina
+    % Forza magnetica (verso l'alto)
+    \draw[->, thick, red!70!black] (0,3.05) -- (0,4.45);
+    \node[labelstyle, right] at (0.12,4.00) {$F_m$};
+
+    % Forza peso (verso il basso)
+    \draw[->, thick, blue!70!black] (0,2.95) -- (0,1.55);
+    \node[labelstyle, right] at (0.12,2.10) {$mg$};
+
+    % Forza d'inerzia (verso il basso)
+    \draw[->, thick, black] (0,2.65) -- (0,1.95);
+    \node[labelstyle, left] at (-0.12,2.35) {$m\ddot{x}$};
+
+    \end{tikzpicture}%
+    }
+    \caption{Schematic of the plant}
+    \label{fig:maglev_plant_scheme}
+\end{figure}
+
+
+The magnetic levitation setup consists of an electromagnet, a steel ball, a light-based position sensor, a current sensor, a power amplifier and a data acquisition board. The control input is the command voltage sent to the amplifier, while the measured outputs are the ball position and the coil current.
+
+The plant can be described through two coupled subsystems. The electrical subsystem determines how the command voltage affects the coil current. The mechanical subsystem determines how the generated magnetic force affects the vertical motion of the ball.

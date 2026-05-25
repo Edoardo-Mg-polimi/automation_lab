@@ -1,0 +1,13 @@
+\subsection{Stability analysis}
+
+The open-loop poles are obtained from the eigenvalues of the state matrix $A$:
+\begin{equation}
+    \lambda_i = \mathrm{eig}(A).
+\end{equation}
+
+Because the mechanical dynamics of the magnetic levitation system are unstable, at least one pole is expected to be in the right half-plane. This confirms that feedback control is required to keep the ball levitated around the selected equilibrium point.
+
+\begin{lstlisting}[style=matlabstyle,caption={Open-loop pole computation in MATLAB.}]
+poles_ol = eig(A_ext);
+disp(poles_ol);
+\end{lstlisting}

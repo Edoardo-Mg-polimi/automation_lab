@@ -1,0 +1,9 @@
+\subsection{Position control}
+
+After closing the current loop, the outer plant can be approximated by the transfer function from current reference variation $\Delta i_{ref}$ to position variation $\Delta x$. The controller is designed using Bode diagrams, root locus or direct loop shaping.
+
+The design objective is to stabilize the unstable mechanical plant while keeping sufficient robustness margins. The resulting open-loop transfer function is
+\begin{equation}
+    L_x(s) = R_x(s)G_x(s),
+\end{equation}
+where $R_x(s)$ is the position controller and $G_x(s)$ is the linearized outer-loop plant.

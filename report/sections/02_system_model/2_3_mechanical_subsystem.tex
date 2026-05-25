@@ -1,0 +1,18 @@
+\subsection{Mechanical subsystem}
+
+Let $x(t)$ be the air gap between the ball and the electromagnet, $m$ the mass of the ball and $g$ the gravitational acceleration. The vertical dynamics are obtained from Newton's law:
+\begin{equation}
+    m\ddot{x}(t) = mg - F_m(x,i),
+    \label{eq:newton}
+\end{equation}
+where the magnetic force is modelled as
+\begin{equation}
+    F_m(x,i) = K_m \frac{i^2(t)}{x^2(t)}.
+    \label{eq:magnetic_force}
+\end{equation}
+
+Substituting \eqnref{eq:magnetic_force} into \eqnref{eq:newton}, the nonlinear mechanical equation becomes
+\begin{equation}
+    \ddot{x}(t) = g - \frac{K_m}{m}\frac{i^2(t)}{x^2(t)}.
+    \label{eq:mechanical_nonlinear}
+\end{equation}
