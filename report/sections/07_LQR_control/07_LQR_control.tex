@@ -1,0 +1,69 @@
+\section{LQR control}
+\label{sec:lqr_control}
+
+\subsection{Obiettivo del progetto LQR}
+\label{subsec:lqr_obiettivo}
+L'obiettivo del regolatore LQR \`e ottenere una legge di controllo ottima (in senso quadratico) che bilanci prestazioni dinamiche e costo energetico del comando.
+
+\subsection{Modello utilizzato per il progetto}
+\label{subsec:lqr_modello}
+Il progetto LQR utilizza lo stesso modello linearizzato esteso:
+\[
+\dot{x}_{ext} = A_{ext}x_{ext} + B_{ext}u_{ext},
+\qquad
+u_{ext} = \Delta i_{ref}.
+\]
+
+\subsection{Funzione di costo}
+\label{subsec:lqr_costo}
+La funzione di costo continua \`e:
+\[
+J = \int_0^{\infty} \left(x_{ext}^T Q x_{ext} + u_{ext}^T R u_{ext}\right)\,dt,
+\]
+con:
+\begin{itemize}
+    \item $Q \succeq 0$: penalizzazione degli stati;
+    \item $R \succ 0$: penalizzazione dell'azione di controllo.
+\end{itemize}
+
+\textbf{Da completare:}
+\begin{itemize}
+    \item scelta numerica di $Q$ e $R$ (eventualmente con criterio di Bryson);
+    \item motivazione fisica dei pesi scelti.
+\end{itemize}
+
+\subsection{Sintesi del controllore}
+\label{subsec:lqr_sintesi}
+La legge di controllo ottima \`e:
+\[
+u_{ext} = -K_{lqr}x_{ext} + N_{lqr}r,
+\]
+dove $K_{lqr}$ deriva dalla soluzione dell'equazione di Riccati algebrica.
+
+\textbf{Da completare:}
+\begin{itemize}
+    \item valori numerici di $K_{lqr}$;
+    \item eventuale prefiltro $N_{lqr}$ per tracking a riferimento costante;
+    \item poli in anello chiuso risultanti.
+\end{itemize}
+
+\subsection{Analisi parametrica dei pesi}
+\label{subsec:lqr_tuning}
+Inserire un confronto qualitativo/quantitativo variando $Q$ e $R$:
+\begin{itemize}
+    \item aumento di $Q$: risposta pi\`u rapida ma comando pi\`u intenso;
+    \item aumento di $R$: comando pi\`u contenuto ma dinamica pi\`u lenta.
+\end{itemize}
+
+\subsection{Validazione e confronto con PP}
+\label{subsec:lqr_validazione}
+Inserire qui:
+\begin{itemize}
+    \item risposta al gradino e metriche temporali principali;
+    \item energia del comando / picco di corrente richiesto;
+    \item confronto diretto con il controllore PP in termini di prestazioni e robustezza locale.
+\end{itemize}
+
+\subsection{Osservazioni finali}
+\label{subsec:lqr_conclusioni}
+Riportare le conclusioni sulla scelta PP vs LQR per il sistema di levitazione considerato.
