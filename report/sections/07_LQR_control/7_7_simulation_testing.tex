@@ -1,0 +1,20 @@
+\subsection{Simulation}
+
+Linear simulations are performed in \texttt{LQ\_simulation.slx}. Nonlinear validation uses \texttt{LQ\_NL\_simulation.slx} for the LQR case and \texttt{LQI\_NL\_simulation.slx} for the LQI case; disturbance comparisons can be reported with \texttt{LQI\_NL\_diff.slx}.
+
+Report here the step responses, overshoot, settling time, and current effort for both LQR and LQI controllers. Compare linear and nonlinear results and highlight any saturation effects.
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.85\textwidth]{lq_step_simulation.pdf}
+%     \caption{Simulation response of the LQR controller.}
+%     \label{fig:lq_step_simulation}
+% \end{figure}
+
+\subsubsection{Stability margins}
+
+For the LQI design, the open-loop system used to compute margins is
+\begin{equation}
+    L_{lqi}(s) = K_{aug}\left(sI - A_{aug}\right)^{-1} B_{aug}.
+\end{equation}
+The gain margin, phase margin, and crossover frequencies are reported here based on the values returned by \texttt{margin} in \texttt{SS\_model\_LQ.m}.

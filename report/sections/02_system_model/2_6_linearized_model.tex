@@ -86,5 +86,53 @@ The measured outputs are position and current:
 \end{equation}
 
 
+
+\subsection{Extended state-space model}
+
+The design uses deviation variables around the equilibrium point. With the closed current loop bandwidth $\omega_i$, the extended state is
+\begin{equation}
+    \vect{x}_{ext} = \begin{bmatrix} \Delta x & \Delta \dot{x} & \Delta i \end{bmatrix}^T,
+\end{equation}
+the input is $\Delta i_{ref}$, and the measured outputs are $\Delta x$ and $\Delta i$.
+
+The linearized coefficients used in \texttt{SS\_model\_PP.m} are
+\begin{equation}
+    k_1 = \frac{2 K_m i_e^2}{m (l - 2 r - x_e)^3},
+    \qquad
+    k_2 = \frac{2 K_m i_e}{m (l - 2 r - x_e)^2}.
+\end{equation}
+
+The extended model is
+\begin{equation}
+    \dot{\vect{x}}_{ext} = A_{ext} \vect{x}_{ext} + B_{ext} \Delta i_{ref},
+\end{equation}
+with
+\begin{equation}
+    A_{ext} =
+    \begin{bmatrix}
+        0 & 1 & 0 \\
+        k_1 & 0 & k_2 \\
+        0 & 0 & -\omega_i
+    \end{bmatrix},
+    \qquad
+    B_{ext} =
+    \begin{bmatrix}
+        0 \\
+        0 \\
+        \omega_i
+    \end{bmatrix}.
+\end{equation}
+
+The measured outputs are collected as
+\begin{equation}
+    C_{ext} =
+    \begin{bmatrix}
+        1 & 0 & 0 \\
+        0 & 0 & 1
+    \end{bmatrix},
+    \qquad
+    D_{ext} = 0.
+\end{equation}
+
 \subsubsection{Mechanical state space model}
 \textcolor{red}{ONLY MECHANICAL State Space MODEL 2x2}

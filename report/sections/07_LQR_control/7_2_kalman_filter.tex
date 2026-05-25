@@ -1,0 +1,22 @@
+\subsection{State estimation with Kalman filter}
+
+State estimation uses a continuous-time Kalman filter (LQE) on the mechanical model. The measured output is the position, with
+\begin{equation}
+    C_{meas} = \begin{bmatrix} 1 & 0 \end{bmatrix}.
+\end{equation}
+Process noise is applied on the acceleration channel,
+\begin{equation}
+    G_{kf} = \begin{bmatrix} 0 \\ 1 \end{bmatrix},
+\end{equation}
+and the tuning values in \texttt{SS\_model\_LQ.m} are
+\begin{equation}
+    \sigma_a = 20, \qquad \sigma_{yx} = 0.1\times10^{-3}.
+\end{equation}
+The covariance matrices are
+\begin{equation}
+    Q_{kf} = \sigma_a^2, \qquad R_{kf} = \sigma_{yx}^2,
+\end{equation}
+and the Kalman gain is
+\begin{equation}
+    L_{kf} = \mathrm{lqe}(A_x, G_{kf}, C_{meas}, Q_{kf}, R_{kf}).
+\end{equation}

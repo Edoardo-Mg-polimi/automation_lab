@@ -1,0 +1,30 @@
+\subsection{LQI with integral action}
+
+To improve steady-state accuracy, an integrator on the position error is added:
+\begin{equation}
+    \dot{\xi} = \Delta x_{ref} - \Delta x.
+\end{equation}
+The augmented state is $\vect{x}_{aug} = \begin{bmatrix} \vect{x}_{ext} & \xi \end{bmatrix}^T$, with
+\begin{equation}
+    A_{aug} =
+    \begin{bmatrix}
+        A_{ext} & 0 \\
+        -C_{pos} & 0
+    \end{bmatrix},
+    \qquad
+    B_{aug} =
+    \begin{bmatrix}
+        B_{ext} \\
+        0
+    \end{bmatrix}.
+\end{equation}
+The LQI weights in \texttt{SS\_model\_LQ.m} are
+\begin{equation}
+    Q_{aug} = \mathrm{diag}(5000, 5\times10^{-1}, 10^{-9}, 9\times10^{4}),
+    \qquad
+    R_{aug} = 5\times10^{-4}.
+\end{equation}
+The resulting gain is
+\begin{equation}
+    K_{aug} = \mathrm{lqr}(A_{aug}, B_{aug}, Q_{aug}, R_{aug}) = \begin{bmatrix} K_{x,lqi} & K_{i,lqi} \end{bmatrix}.
+\end{equation}

@@ -1,0 +1,35 @@
+\subsection{Pole placement with integral action}
+
+To remove steady-state error, an integrator on the position error is added:
+\begin{equation}
+    \dot{\xi} = \Delta x_{ref} - \Delta x.
+\end{equation}
+The augmented state is $\vect{x}_{aug} = \begin{bmatrix} \vect{x}_{ext} & \xi \end{bmatrix}^T$, with
+\begin{equation}
+    A_{aug} =
+    \begin{bmatrix}
+        A_{ext} & 0 \\
+        -C_{pos} & 0
+    \end{bmatrix},
+    \quad
+    B_{aug} =
+    \begin{bmatrix}
+        B_{ext} \\
+        0
+    \end{bmatrix},
+    \quad
+    B_{r} =
+    \begin{bmatrix}
+        0 \\
+        1
+    \end{bmatrix}.
+\end{equation}
+
+In \texttt{SS\_model\_PP.m} the integral pole is chosen as $p_{int} = -3$ and the augmented pole set is
+\begin{equation}
+    p_{ctrl,aug} = \{-70, -75, p_{int}, -\omega_i\}.
+\end{equation}
+The gain is obtained with
+\begin{equation}
+    K_{aug} = \mathrm{place}(A_{aug}, B_{aug}, p_{ctrl,aug}) = \begin{bmatrix} K_x & K_i \end{bmatrix}.
+\end{equation}

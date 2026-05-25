@@ -1,0 +1,11 @@
+\subsection{LQR controller}
+
+The LQR controller is synthesized on the extended model $\left(A_{ext}, B_{ext}\right)$. The weights selected in \texttt{SS\_model\_LQ.m} are
+\begin{equation}
+    Q_{lq} = \mathrm{diag}(5000, 3, 10^{-9}), \qquad R_{lq} = 10^{-2}.
+\end{equation}
+The feedback gain is
+\begin{equation}
+    K_{lq} = \mathrm{lqr}(A_{ext}, B_{ext}, Q_{lq}, R_{lq}).
+\end{equation}
+The closed-loop poles are verified from $A_{ext} - B_{ext} K_{lq}$.
