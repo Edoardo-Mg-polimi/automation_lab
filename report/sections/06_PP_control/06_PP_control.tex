@@ -1,24 +1,30 @@
-\subsection{State-space model for Pole Placement}
+\section{Pole Placement (PP) control}
+\label{sec:pp_control}
 
-The Pole Placement controller is designed on the extended linearized model obtained by combining the mechanical subsystem with the closed-loop current dynamics. The state vector is defined as
+\subsection{Obiettivo del controllore PP}
+\label{subsec:pp_obiettivo}
+Obiettivo: progettare un controllore a retroazione di stato che soddisfi le specifiche di posizionamento della pallina in termini di rapidit\`a, sovraelongazione e robustezza locale attorno al punto di equilibrio.
+
+\subsection{Modello in spazio di stato esteso}
+\label{subsec:pp_modello}
+Il controllore PP viene progettato sul modello linearizzato esteso che combina la dinamica meccanica con l'anello interno di corrente.
+
+\[
+\dot{x}_{ext} = A_{ext}x_{ext} + B_{ext}u_{ext},
+\qquad
+y_{ext} = C_{ext}x_{ext}.
+\]
+
+Con:
 \[
 x_{ext} =
 \begin{bmatrix}
 \Delta x & \Delta \dot{x} & \Delta i
-\end{bmatrix}^T ,
-\]
-where \(\Delta x\) is the ball position variation around the equilibrium point, \(\Delta \dot{x}\) is the velocity variation and \(\Delta i\) is the coil current variation.
-
-The control input is the current reference variation:
-\[
+\end{bmatrix}^{T},
+\qquad
 u_{ext} = \Delta i_{ref}.
 \]
 
-The extended model is:
-\[
-\dot{x}_{ext} = A_{ext}x_{ext} + B_{ext}u_{ext},
-\]
-with
 \[
 A_{ext} =
 \begin{bmatrix}
@@ -32,14 +38,52 @@ B_{ext} =
 0\\
 0\\
 \omega_i
-\end{bmatrix}.
-\]
-
-The output matrix is chosen in order to observe both the ball position and the coil current:
-\[
+\end{bmatrix},
+\qquad
 C_{ext} =
 \begin{bmatrix}
 1 & 0 & 0\\
 0 & 0 & 1
 \end{bmatrix}.
 \]
+
+\subsection{Scelta dei poli desiderati}
+\label{subsec:pp_poli}
+Inserire qui il criterio di scelta dei poli (es. da specifiche su tempo di assestamento e smorzamento):
+\begin{itemize}
+    \item poli dominanti per la dinamica di posizione;
+    \item eventuale polo aggiuntivo pi\`u veloce per la dinamica di corrente;
+    \item verifica del compromesso tra velocit\`a e sensibilit\`a al rumore.
+\end{itemize}
+
+\subsection{Calcolo del guadagno di stato}
+\label{subsec:pp_guadagno}
+Legge di controllo proposta:
+\[
+u_{ext} = -K_{pp}x_{ext} + N_{pp}r,
+\]
+dove:
+\begin{itemize}
+    \item $K_{pp}$ \`e il vettore dei guadagni ottenuto con assegnamento dei poli;
+    \item $N_{pp}$ \`e il prefiltro (feedforward) per annullare l'errore statico al riferimento costante.
+\end{itemize}
+
+\textbf{Da completare:}
+\begin{itemize}
+    \item valori numerici di $K_{pp}$ e $N_{pp}$;
+    \item metodo utilizzato (\texttt{place}, Ackermann, ecc.);
+    \item confronto tra poli desiderati e poli effettivi in anello chiuso.
+\end{itemize}
+
+\subsection{Validazione in simulazione}
+\label{subsec:pp_validazione}
+Inserire i risultati di simulazione:
+\begin{itemize}
+    \item risposta al gradino in posizione;
+    \item sforzo di controllo $\Delta i_{ref}$;
+    \item eventuale rigetto di disturbi e sensibilit\`a a variazioni parametriche.
+\end{itemize}
+
+\subsection{Commento critico}
+\label{subsec:pp_commento}
+Riassumere punti di forza e limiti del PP rispetto all'architettura cascata progettata nella sezione precedente.
