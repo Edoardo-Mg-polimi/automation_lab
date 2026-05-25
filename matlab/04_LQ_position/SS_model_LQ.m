@@ -190,30 +190,26 @@ fprintf(' 3) KALMAN FILTER - LQE\n');
 % y = [delta_x_meas; delta_i_meas]
 
 % Matrice di misura del sistema
-C_meas = [1 0 0;
-          0 0 1];
+C_meas = [1 0];
 
 % Disturbi di processo:
 % w1 = disturbo equivalente sull'accelerazione
 % w2 = disturbo equivalente sulla dinamica di corrente
-G_kf = [0 0;
-        1 0;
-        0 1];
+G_kf = [0;
+        1];
 
 % taratura 1: incertezza sul modello
 sigma_a = 20;       % [m/s^2], incertezza sull'accelerazione
-sigma_i = 5;    % [A/s], incertezza equivalente sulla dinamica corrente
 
-Q_kf = diag([sigma_a^2, sigma_i^2]);
+Q_kf = sigma_a^2;
 
 % taratura 2: incertezza sulle misurazioni
 sigma_yx = 0.1e-3;  % [m], rumore sensore posizione
-sigma_yi = 0.001;     % [A], rumore sensore corrente
 
-R_kf = diag([sigma_yx^2, sigma_yi^2]);
+R_kf = sigma_yx^2;
 
 % Guadagno Kalman continuo
-[L_kf, P_kf, eig_kf] = lqe(A_ext, G_kf, C_meas, Q_kf, R_kf);
+[L_kf, P_kf, eig_kf] = lqe(A_x, G_kf, C_meas, Q_kf, R_kf);
 
 fprintf('\nGuadagno Kalman L_kf:\n');
 disp(L_kf);
@@ -222,7 +218,7 @@ fprintf('Poli del filtro di Kalman:\n');
 disp(eig_kf);
 
 % Oppure, equivalente:
-disp(eig(A_ext - L_kf*C_meas));
+disp(eig(A_x - L_kf*C_meas));
 
 % Modello del filtro:
 % xhat_dot = A_ext*xhat + B_ext*u + L_kf*(y - C_meas*xhat)
@@ -238,11 +234,11 @@ disp(eig(A_ext - L_kf*C_meas));
 % uscite filtro:
 % output = [delta_x_hat; delta_xdot_hat; delta_i_hat]
 
-A_kf = A_ext - L_kf*C_meas;
-B_kf = [L_kf B_ext];
+A_kf = A_x - L_kf*C_meas;
+B_kf = [L_kf B_x];
 
-C_kf = eye(3);
-D_kf = zeros(3,3);
+C_kf = eye(2);
+D_kf = zeros(2,2);
 
 SS_kf = ss(A_kf, B_kf, C_kf, D_kf);
 
@@ -269,11 +265,15 @@ delta_xd_max = 0.05;   % [m/s]
 
 delta_iref_max = 1.5; % [A]
 
-Q_lq = diag([1/delta_x_max^2, ...
-               1/delta_xd_max^2, ...
-               0]);
+% Q_lq = diag([1/delta_x_max^2, ...
+%                1/delta_xd_max^2, ...
+%                0]);
+% 
+% R_lq = 1/delta_iref_max^2;
 
-R_lq = 1/delta_iref_max^2;
+
+Q_lq = diag([5000, 3, 1e-9]);
+R_lq = 1e-2;
 
 fprintf('\nMatrice Q_lq:\n');
 disp(Q_lq);
@@ -343,15 +343,19 @@ end
 
 
 % gli altri parametri sono stati tarati prima
-delta_xi_max     = 0.0005;    % [m*s], diminuire pr aumentare l'azione integrale
+delta_xi_max     = 0.001;    % [m*s], diminuire pr aumentare l'azione integrale
 
 
-Q_aug = diag([1/delta_x_max^2, ...
-              1/delta_xd_max^2, ...
-              0, ...
-              1/delta_xi_max^2]);
+% Q_aug = diag([1/delta_x_max^2, ...
+%               1/delta_xd_max^2, ...
+%               0.000000001, ...
+%               1/delta_xi_max^2]);
+% 
+% R_aug = 1/delta_iref_max^2;
 
-R_aug = 1/delta_iref_max^2;
+% Q_aug = diag([5000, 5e-1, 1e-9, 3e4]);
+Q_aug = diag([5000, 5e-1, 1e-9, 9e4]);
+R_aug = 5e-4;
 
 fprintf('\nMatrice Q_aug:\n');
 disp(Q_aug);
@@ -406,17 +410,10 @@ end
 % Sistema chiuso da riferimento di posizione a posizione
 SS_cl_lqi = ss(A_cl_lqi, Br_aug, C_aug, 0);
 
-fprintf('\nSistema chiuso LQI da delta_x_ref a delta_x:\n');
-SS_cl_lqi
 
 % Guadagno statico da riferimento a uscita
 dc_gain_lqi = dcgain(SS_cl_lqi);
 
-fprintf('\nGuadagno statico da delta_x_ref a delta_x:\n');
-disp(dc_gain_lqi);
-
-fprintf('Errore statico teorico per riferimento costante:\n');
-disp(1 - dc_gain_lqi);
 
 % Informazioni sui poli: frequenza naturale e smorzamento
 [wn_lqi, zeta_lqi, p_lqi] = damp(SS_cl_lqi);
@@ -452,8 +449,6 @@ L_lqi = ss(A_aug, B_aug, K_aug, 0);
 % Semplificazione numerica, utile se ci sono cancellazioni quasi esatte
 L_lqi = minreal(L_lqi);
 
-fprintf('\nFunzione d anello LQI L(s):\n');
-L_lqi
 
 % Calcolo margini
 [GM_lqi, PM_lqi, Wcg_lqi, Wcp_lqi] = margin(L_lqi);
@@ -475,8 +470,4 @@ fprintf('Phase margin: %.6f deg\n', PM_lqi);
 fprintf('Frequenza phase crossover Wcg: %.6f rad/s\n', Wcg_lqi);
 fprintf('Frequenza gain crossover Wcp: %.6f rad/s\n', Wcp_lqi);
 
-% Plot dei margini
-figure;
-margin(L_lqi);
-grid on;
-title('Margini di stabilità del loop LQI');
+
