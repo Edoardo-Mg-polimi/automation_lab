@@ -1,4 +1,5 @@
 \subsection{The setup}
+% forces scheme
 \begin{figure}[H]
     \centering
     \resizebox{0.75\textwidth}{!}{%
@@ -20,20 +21,20 @@
 
     % Base sensore: bordo superiore allineato con y=0
     \draw[sensor] (-1.0,-0.30) rectangle (1.0,0);
-    \node[labelstyle, below] at (0,-0.30) {sensore, base $x=0$};
+    \node[labelstyle, below] at (0,-0.30) {sensor, base $x=0$};
 
     % Pallina
     \draw[ball] (ball_center) circle (0.8);
     \fill (ball_center) circle (1.5pt);
 
     % Scritte spostate più a destra
-    \node[labelstyle, right] at (1.6,3.00) {centro pallina, $x+r$};
-    \node[labelstyle, right] at (1.6,2.20) {misura sensore, $x$};
-    \node[labelstyle, right] at (1.6,3.80) {sommità pallina, $x+2r$};
+    \node[labelstyle, right] at (1.6,3.00) {ball center, $x+r$};
+    \node[labelstyle, right] at (1.6,2.20) {sensor reading, $x$};
+    \node[labelstyle, right] at (1.6,3.80) {ball top, $x+2r$};
 
     % Elettromagnete
     \draw[magnet] (-1.1,5.2) rectangle (1.1,5.8);
-    \node[labelstyle, above] at (0,5.8) {elettromagnete};
+    \node[labelstyle, above] at (0,5.8) {electromagnet};
     \node[labelstyle, right] at (1.15,5.2) {$l$};
 
     % Linee tratteggiate di riferimento
@@ -68,11 +69,11 @@
 
     % Forza peso (verso il basso)
     \draw[->, thick, blue!70!black] (0,2.95) -- (0,1.55);
-    \node[labelstyle, right] at (0.12,2.10) {$mg$};
+    \node[labelstyle, right] at (0.12,1.6) {$mg$};
 
     % Forza d'inerzia (verso il basso)
     \draw[->, thick, black] (0,2.65) -- (0,1.95);
-    \node[labelstyle, left] at (-0.12,2.35) {$m\ddot{x}$};
+    \node[labelstyle, left] at (-0.12,2.0) {$m\ddot{x}$};
 
     \end{tikzpicture}%
     }
@@ -81,6 +82,19 @@
 \end{figure}
 
 
-The magnetic levitation setup consists of an electromagnet, a steel ball, a light-based position sensor, a current sensor, a power amplifier and a data acquisition board. The control input is the command voltage sent to the amplifier, while the measured outputs are the ball position and the coil current.
+The magnetic levitation setup consists of:
+\begin{itemize}
+    \item an electromagnet
+    \item a steel ball
+    \item a light-based position sensor
+    \item a current sensor
+    \item a power amplifier (of gain $K_g$)
+\end{itemize}
+The control input is the command voltage sent to the amplifier, while the measured outputs are the ball position and the coil current.
 
-The plant can be described through two coupled subsystems. The electrical subsystem determines how the command voltage affects the coil current. The mechanical subsystem determines how the generated magnetic force affects the vertical motion of the ball.
+The plant can be described through two coupled subsystems:
+\begin{enumerate}
+    \item The electrical subsystem determines how the command voltage affects the coil current.
+    \item The mechanical subsystem determines how the generated magnetic force affects the vertical motion of the ball.
+\end{enumerate}
+ 
