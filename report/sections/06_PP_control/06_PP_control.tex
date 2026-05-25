@@ -1,0 +1,45 @@
+\subsection{State-space model for Pole Placement}
+
+The Pole Placement controller is designed on the extended linearized model obtained by combining the mechanical subsystem with the closed-loop current dynamics. The state vector is defined as
+\[
+x_{ext} =
+\begin{bmatrix}
+\Delta x & \Delta \dot{x} & \Delta i
+\end{bmatrix}^T ,
+\]
+where \(\Delta x\) is the ball position variation around the equilibrium point, \(\Delta \dot{x}\) is the velocity variation and \(\Delta i\) is the coil current variation.
+
+The control input is the current reference variation:
+\[
+u_{ext} = \Delta i_{ref}.
+\]
+
+The extended model is:
+\[
+\dot{x}_{ext} = A_{ext}x_{ext} + B_{ext}u_{ext},
+\]
+with
+\[
+A_{ext} =
+\begin{bmatrix}
+0 & 1 & 0\\
+k_1 & 0 & k_2\\
+0 & 0 & -\omega_i
+\end{bmatrix},
+\qquad
+B_{ext} =
+\begin{bmatrix}
+0\\
+0\\
+\omega_i
+\end{bmatrix}.
+\]
+
+The output matrix is chosen in order to observe both the ball position and the coil current:
+\[
+C_{ext} =
+\begin{bmatrix}
+1 & 0 & 0\\
+0 & 0 & 1
+\end{bmatrix}.
+\]

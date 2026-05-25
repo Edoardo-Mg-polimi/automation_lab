@@ -6,18 +6,16 @@ The nonlinear model is written by choosing the state vector
     = \begin{bmatrix} x & \dot{x} & i \end{bmatrix}^T.
 \end{equation}
 
+In order: position, velocity and current.
+
 Using the amplifier command $u$ as input, the nonlinear state-space model is
 \begin{equation}
 \begin{cases}
-    \dot{x}_1 = x_2, \\
-    \dot{x}_2 = g - \dfrac{K_m}{m}\dfrac{x_3^2}{x_1^2}, \\
-    \dot{x}_3 = -\dfrac{R}{L}x_3 + \dfrac{K_g}{L}u.
+    \dot{x}_1 = x_2 \\
+    \dot{x}_2 = g - \dfrac{K_m}{m}\dfrac{x_3^2}{x_1^2} \\
+    \dot{x}_3 = -\dfrac{R}{L}x_3 + \dfrac{K_g}{L}u\\
+    y = x_1
 \end{cases}
 \label{eq:nonlinear_ss}
 \end{equation}
 
-If the inner current loop is considered already closed, the third equation can be replaced by
-\begin{equation}
-    \dot{x}_3 = -\omega_i x_3 + \omega_i i_{ref}.
-    \label{eq:current_loop_state}
-\end{equation}

@@ -1,5 +1,30 @@
 \subsection{Linearized model}
 
+\subsubsection{Equilibrium point}
+The equilibrium point is defined by imposing zero velocity and zero acceleration:
+\begin{equation}
+    \dot{x}_1 = 0, \qquad \dot{x}_2 = 0, \qquad \dot{x}_3 = 0.
+\end{equation}
+
+For a selected equilibrium air gap $x_e$, the corresponding equilibrium current is
+\begin{equation}
+    i_e = x_e \sqrt{\frac{m g}{K_m}}.
+    \label{eq:equilibrium_current}
+\end{equation}
+
+The equilibrium command voltage is obtained from the electrical steady-state condition:
+\begin{equation}
+    u_e = \frac{R i_e}{K_g}.
+    \label{eq:equilibrium_voltage}
+\end{equation}
+
+In the implemented controllers, it is important to distinguish absolute variables from deviation variables:
+\begin{equation}
+    \Delta x = x - x_e, \qquad \Delta i = i - i_e, \qquad \Delta u = u - u_e.
+\end{equation}
+
+
+\subsubsection{Linearization}
 The nonlinear model is linearized around the equilibrium point $\left(x_e,0,i_e,u_e\right)$. Using deviation variables, the linearized model is
 \begin{equation}
     \Delta\dot{\vect{x}} = A\Delta\vect{x} + B\Delta u,
@@ -60,4 +85,6 @@ The measured outputs are position and current:
     \label{eq:output_matrix}
 \end{equation}
 
+
+\subsubsection{Mechanical state space model}
 \textcolor{red}{ONLY MECHANICAL State Space MODEL 2x2}

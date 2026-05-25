@@ -1,4 +1,5 @@
-\subsection{EM coil current control}
+\subsection{Current control}
+% current control scheme
 \begin{figure}[H]
     \centering
     \resizebox{0.95\textwidth}{!}{%
@@ -86,6 +87,7 @@
     \label{fig:block_current_control_sat}
 \end{figure}
 
+\subsubsection{Controller design: BODE method}
 
 The first control task is the design of an inner current loop. The open-loop transfer function from the amplifier command voltage to the coil current is obtained from the RL model:
 \begin{equation}
@@ -106,3 +108,9 @@ The closed-loop current transfer function is
 \begin{equation}
     H_i(s) = \frac{R_i(s)G_i(s)}{1+R_i(s)G_i(s)}.
 \end{equation}
+
+
+\subsubsection{Anti Windup}
+\textcolor{blue}{GRAPH: anti windup}
+
+\subsubsection{Current control validation}
