@@ -1,16 +1,106 @@
 \subsection{Linearized model}
 
 \subsubsection{Equilibrium point}
+% schema forze equilibrio
+\begin{figure}[H]
+    \centering
+    \resizebox{0.5\textwidth}{!}{%
+    \begin{tikzpicture}[
+        >=Latex,
+        dim/.style={<->, thick},
+        labelstyle/.style={font=\small},
+        magnet/.style={draw, thick, fill=gray!25},
+        sensor/.style={draw, thick, fill=blue!10},
+        ball/.style={draw, thick, fill=gray!35}
+    ]
+
+    % Coordinate principali
+    \coordinate (ball_center) at (0,3.0);
+
+    % Sensore/base
+    \draw[sensor] (-1.0,-0.30) rectangle (1.0,0);
+    \node[labelstyle, below] at (0,-0.30) {sensor, base $x=0$};
+
+    % Pallina
+    \draw[ball] (ball_center) circle (0.8);
+    \fill (ball_center) circle (1.5pt);
+
+    % Elettromagnete
+    \draw[magnet] (-1.1,5.2) rectangle (1.1,5.8);
+    \node[labelstyle, above] at (0,5.8) {electromagnet};
+
+    % Linee tratteggiate
+    \draw[dashed] (-1.6,0) -- (1.6,0);
+    \draw[dashed] (-1.6,2.2) -- (1.6,2.2);
+    \draw[dashed] (-1.6,3.8) -- (1.6,3.8);
+    \draw[dashed] (-1.6,5.2) -- (1.6,5.2);
+
+    % Quote
+    \draw[dim] (-1.6,0) -- (-1.6,2.2);
+    \node[labelstyle, left] at (-0.95,1.1) {$x_e$};
+
+    \draw[dim] (-1.95,0) -- (-1.95,5.2);
+    \node[labelstyle, left] at (-1.95,2.6) {$l$};
+
+    \draw[dim] (1.7,3.8) -- (1.7,5.2);
+    \node[labelstyle, right, align=left] at (1.7,4.5)
+    {$d_e = l-x_e-2r$};
+
+    % Etichette
+ 
+
+    % Forze in equilibrio
+    \draw[->, thick, red!70!black] (0,3.05) -- (0,4.35);
+    \node[labelstyle, right] at (0.15,4.0) {$F_m$};
+
+    \draw[->, thick, blue!70!black] (0,2.95) -- (0,1.65);
+    \node[labelstyle, right] at (0.15,1.9) {$mg$};
+
+    % Condizione di equilibrio
+    \node[labelstyle, align=left] at (3.1,3.0){$F_m = mg$};
+
+    \end{tikzpicture}%
+    }
+    \caption{Magnetic levitation system at equilibrium.}
+    \label{fig:maglev_equilibrium}
+\end{figure}
+
+
 The equilibrium point is defined by imposing zero velocity and zero acceleration:
-\begin{equation}
+\begin{equation*}
     \dot{x}_1 = 0, \qquad \dot{x}_2 = 0, \qquad \dot{x}_3 = 0.
-\end{equation}
+\end{equation*}
+
+In this case there is no intertial force.
+Therefore:
+\begin{equation*}
+    F_m = mg
+\end{equation*}
+with 
+\begin{equation*}
+    F_m = K_m \frac{i_e^2}{(l - x_e - 2r)^2}
+\end{equation*}
 
 For a selected equilibrium air gap $x_e$, the corresponding equilibrium current is
 \begin{equation}
-    i_e = x_e \sqrt{\frac{m g}{K_m}}.
+    i_e = \sqrt{\frac{m g}{K_m}} (l - x_e - 2r).
     \label{eq:equilibrium_current}
 \end{equation}
+As we can see $i_e$ and $x_e$ are linearly dependent. The equilibrium point is not unique, so we can select a $x_e$
+as a design parameter and then compute $i_e$ from \eqref{eq:equilibrium_current}.
+
+We select $x_e = \frac{l}{2} - r = 7$ mm. Exactely in the middle between the sensor and the electromagnet.
+Then 
+\begin{equation*}
+\begin{aligned}
+i_e 
+&= \sqrt{\frac{m g}{K_m}}
+\left(l - \frac{l}{2} + r - 2r\right) \\[1mm]
+&= \sqrt{\frac{m g}{K_m}}
+\left(\frac{l}{2} - r\right) \\[1mm]
+&\simeq 0.7 \ \mathrm{A}.
+\end{aligned}
+\end{equation*}
 
 The equilibrium command voltage is obtained from the electrical steady-state condition:
 \begin{equation}
@@ -19,103 +109,44 @@ The equilibrium command voltage is obtained from the electrical steady-state con
 \end{equation}
 
 In the implemented controllers, it is important to distinguish absolute variables from deviation variables:
-\begin{equation}
+\begin{equation*}
     \Delta x = x - x_e, \qquad \Delta i = i - i_e, \qquad \Delta u = u - u_e.
-\end{equation}
+\end{equation*}
 
 
 \subsubsection{Linearization}
 The nonlinear model is linearized around the equilibrium point $\left(x_e,0,i_e,u_e\right)$. Using deviation variables, the linearized model is
-\begin{equation}
-    \Delta\dot{\vect{x}} = A\Delta\vect{x} + B\Delta u,
-    \qquad
-    \Delta y = C\Delta\vect{x} + D\Delta u.
-    \label{eq:linear_ss_general}
-\end{equation}
-
-If the raw electrical dynamics are included, the matrices are
-\begin{equation}
-A =
-\begin{bmatrix}
-0 & 1 & 0 \\
-\dfrac{2g}{x_e} & 0 & -\dfrac{2g}{i_e} \\
-0 & 0 & -\dfrac{R}{L}
-\end{bmatrix},
-\qquad
-B =
-\begin{bmatrix}
-0 \\
-0 \\
-\dfrac{K_g}{L}
-\end{bmatrix}.
-\label{eq:linear_matrices_voltage}
-\end{equation}
-
-If the inner current loop is already closed and $\Delta i_{ref}$ is the input of the outer-loop model, the matrices become
-\begin{equation}
-A =
-\begin{bmatrix}
-0 & 1 & 0 \\
-\dfrac{2g}{x_e} & 0 & -\dfrac{2g}{i_e} \\
-0 & 0 & -\omega_i
-\end{bmatrix},
-\qquad
-B =
-\begin{bmatrix}
-0 \\
-0 \\
-\omega_i
-\end{bmatrix}.
-\label{eq:linear_matrices_current_loop}
-\end{equation}
-
-The measured outputs are position and current:
-\begin{equation}
-    C =
-    \begin{bmatrix}
-        1 & 0 & 0 \\
-        0 & 0 & 1
-    \end{bmatrix},
-    \qquad
-    D =
-    \begin{bmatrix}
-        0 \\
-        0
-    \end{bmatrix}.
-    \label{eq:output_matrix}
-\end{equation}
-
-
-
-\subsection{Extended state-space model}
 
 The design uses deviation variables around the equilibrium point. With the closed current loop bandwidth $\omega_i$, the extended state is
-\begin{equation}
-    \vect{x}_{ext} = \begin{bmatrix} \Delta x & \Delta \dot{x} & \Delta i \end{bmatrix}^T,
-\end{equation}
+\begin{equation*}
+    \vect{x} = \begin{bmatrix} \Delta x & \Delta \dot{x} & \Delta i \end{bmatrix}^T,
+\end{equation*}
 the input is $\Delta i_{ref}$, and the measured outputs are $\Delta x$ and $\Delta i$.
 
-The linearized coefficients used in \texttt{SS\_model\_PP.m} are
+\textcolor{red}{ALL THE LINEARIZATION CALCULUS}
+
+
+Defining
 \begin{equation}
     k_1 = \frac{2 K_m i_e^2}{m (l - 2 r - x_e)^3},
     \qquad
     k_2 = \frac{2 K_m i_e}{m (l - 2 r - x_e)^2}.
 \end{equation}
 
-The extended model is
+The model is
 \begin{equation}
-    \dot{\vect{x}}_{ext} = A_{ext} \vect{x}_{ext} + B_{ext} \Delta i_{ref},
+    \dot{\vect{x}} = A \vect{x} + B \Delta i_{ref},
 \end{equation}
 with
 \begin{equation}
-    A_{ext} =
+    A =
     \begin{bmatrix}
         0 & 1 & 0 \\
         k_1 & 0 & k_2 \\
         0 & 0 & -\omega_i
     \end{bmatrix},
     \qquad
-    B_{ext} =
+    B =
     \begin{bmatrix}
         0 \\
         0 \\
@@ -125,13 +156,13 @@ with
 
 The measured outputs are collected as
 \begin{equation}
-    C_{ext} =
+    C =
     \begin{bmatrix}
         1 & 0 & 0 \\
         0 & 0 & 1
     \end{bmatrix},
     \qquad
-    D_{ext} = 0.
+    D = 0.
 \end{equation}
 
 \subsubsection{Mechanical state space model}

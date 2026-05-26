@@ -2,7 +2,7 @@
 % forces scheme
 \begin{figure}[H]
     \centering
-    \resizebox{0.75\textwidth}{!}{%
+    \resizebox{0.5\textwidth}{!}{%
     \begin{tikzpicture}[
         >=Latex,
         dim/.style={<->, thick},
@@ -35,7 +35,6 @@
     % Elettromagnete
     \draw[magnet] (-1.1,5.2) rectangle (1.1,5.8);
     \node[labelstyle, above] at (0,5.8) {electromagnet};
-    \node[labelstyle, right] at (1.15,5.2) {$l$};
 
     % Linee tratteggiate di riferimento
     \draw[dashed] (-1.7,0) -- (1.7,0);
@@ -60,7 +59,7 @@
     % Air gap
     \draw[dim] (1.75,3.8) -- (1.75,5.2);
     \node[labelstyle, right, align=left] at (1.75,4.5)
-    {$d(x)$\\$=l-x-2r$};
+    {$d(x) = l-x-2r$};
 
     % Forze allineate sull'asse centrale della pallina
     % Forza magnetica (verso l'alto)

@@ -1,2 +1,11 @@
 \subsection{FDT mechanical model}
 \textcolor{red}{SHOULD WE DO IT?}
+Starting from the state-space \textbf{linearized} model of the system
+\begin{align}
+\dot{x}(t) &= Ax(t) + Bu(t) \\
+y(t) &= Cx(t) + Du(t),
+\end{align}
+the corresponding transfer function is obtained as
+\begin{equation}
+G(s) = \frac{Y(s)}{U(s)} = C(sI - A)^{-1}B + D.
+\end{equation}

@@ -468,6 +468,6 @@ end
 
 fprintf('Phase margin: %.6f deg\n', PM_lqi);
 fprintf('Frequenza phase crossover Wcg: %.6f rad/s\n', Wcg_lqi);
-fprintf('Frequenza gain crossover Wcp: %.6f rad/s\n', Wcp_lqi);
+
 
 

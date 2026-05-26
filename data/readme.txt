@@ -23,8 +23,8 @@ FB VALIDATION IN TIME DOMAIN:
 FB VALIDATION IN FREQQUENCY DOMAIN:
 1 tempo
 2 position reference
-3 posizione misurata NON FILTRATA
-4  posizione misurata FILTRATA
+ 3 posizione misurata NON FILTRATA
+ É STATO TOLTO -> 4  posizione misurata FILTRATA
 5 reference corrente
 6 corrente misurata
 7 tensione di ingresso
