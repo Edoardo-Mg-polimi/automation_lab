@@ -292,14 +292,20 @@ disp(Kx);
 fprintf('Guadagno Ki:\n');
 disp(Ki);
 
+
+
+% 5.4) Sistema chiuso
 A_cl_aug = A_aug - B_aug*K_aug;
 
 fprintf('Poli ottenuti con pole placement aumentato:\n');
 disp(eig(A_cl_aug));
 
-% 5.4) Sistema chiuso
-SS_cl_aug = ss(A_cl_aug, Br_aug, C_aug, 0);
+H_x = ss(A_cl_aug, Br_aug, C_aug, 0);
 
+figure
+bode(H_x)
+grid on
+title('Bode H_x(s) controlled closed loop PP')
 
 
 

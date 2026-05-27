@@ -1,6 +1,10 @@
 \subsection{Pole placement controller}
 
-The controller uses full-state feedback on the extended model. The desired closed-loop poles in \texttt{SS\_model\_PP.m} are
+\paragraph{Requirements}
+\textcolor{red}{how work pp, why we use $\omega_i$}
+
+\paragraph{Simple pole placement}
+The controller uses full-state feedback on the entire system model. The desired closed-loop poles in \texttt{SS\_model\_PP.m} are
 \begin{equation}
     p_{ctrl} = \{-70, -75, -\omega_i\},
 \end{equation}
@@ -20,13 +24,12 @@ The reference scaling used in \texttt{SS\_model\_PP.m} is
 with $C_{pos} = \begin{bmatrix} 1 & 0 & 0 \end{bmatrix}$.
 
 
-\subsection{Pole placement with integral action}
-
-To remove steady-state error, an integrator on the position error is added:
+\paragraph{Pole placement with integral action}
+To remove steady-state error and achieve the position reference, an integrator on the position error is added:
 \begin{equation}
-    \dot{\xi} = \Delta x_{ref} - \Delta x.
+    \dot{x_i} = \Delta x_{ref} - \Delta x.
 \end{equation}
-The augmented state is $\vect{x}_{aug} = \begin{bmatrix} \vect{x}_{ext} & \xi \end{bmatrix}^T$, with
+The augmented state is $\vect{x}_{aug} = \begin{bmatrix} \vect{x}_{ext} & x_i \end{bmatrix}^T$, with
 \begin{equation}
     A_{aug} =
     \begin{bmatrix}
@@ -47,6 +50,7 @@ The augmented state is $\vect{x}_{aug} = \begin{bmatrix} \vect{x}_{ext} & \xi \e
     \end{bmatrix}.
 \end{equation}
 
+\textcolor{red}{why the integrator pole is at...}
 In \texttt{SS\_model\_PP.m} the integral pole is chosen as $p_{int} = -3$ and the augmented pole set is
 \begin{equation}
     p_{ctrl,aug} = \{-70, -75, p_{int}, -\omega_i\}.
