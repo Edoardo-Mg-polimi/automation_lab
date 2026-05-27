@@ -102,11 +102,14 @@ i_e
 \end{aligned}
 \end{equation*}
 
+Linearization point: $
+\boxed{x_e = 7\ \text{mm} \qquad i_e = 0.7\ \text{A}}
+$
+
 The equilibrium command voltage is obtained from the electrical steady-state condition:
-\begin{equation}
-    u_e = \frac{R i_e}{K_g}.
-    \label{eq:equilibrium_voltage}
-\end{equation}
+\[
+   v_e = u_e = \frac{R}{K_g} i_e \simeq 6.614\ \text{V}.
+\]
 
 In the implemented controllers, it is important to distinguish absolute variables from deviation variables:
 \begin{equation*}
@@ -127,11 +130,12 @@ the input is $\Delta i_{ref}$, and the measured outputs are $\Delta x$ and $\Del
 
 
 Defining
-\begin{equation}
-    k_1 = \frac{2 K_m i_e^2}{m (l - 2 r - x_e)^3},
+\[
+    k_1 = \frac{2 K_m i_e^2}{m (l - 2 r - x_e)^3} \simeq 2802.857
     \qquad
-    k_2 = \frac{2 K_m i_e}{m (l - 2 r - x_e)^2}.
-\end{equation}
+    k_2 = \frac{2 K_m i_e}{m (l - 2 r - x_e)^2} \simeq 27.732
+\]
+
 
 The model is
 \begin{equation}
@@ -164,6 +168,3 @@ The measured outputs are collected as
     \qquad
     D = 0.
 \end{equation}
-
-\subsubsection{Mechanical state space model}
-\textcolor{red}{ONLY MECHANICAL State Space MODEL 2x2}

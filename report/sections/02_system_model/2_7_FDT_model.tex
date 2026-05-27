@@ -1,11 +1,95 @@
-\subsection{FDT mechanical model}
-\textcolor{red}{SHOULD WE DO IT?}
-Starting from the state-space \textbf{linearized} model of the system
-\begin{align}
-\dot{x}(t) &= Ax(t) + Bu(t) \\
-y(t) &= Cx(t) + Du(t),
-\end{align}
-the corresponding transfer function is obtained as
+\subsection{Mechanical linearized model}
+
+Starting from the complete linearized state-space model, the mechanical subsystem can be isolated by considering only the position and velocity states, and by taking the current variation $\Delta i$ as input.
+
+\subsubsection{Mechanical state space model}
+
+The mechanical state vector is defined as
+
 \begin{equation}
-G(s) = \frac{Y(s)}{U(s)} = C(sI - A)^{-1}B + D.
+    x_m =
+    \begin{bmatrix}
+        \Delta x \\
+        \Delta \dot{x}
+    \end{bmatrix},
 \end{equation}
+
+with input $\Delta i$ and output $\Delta x$. The mechanical linearized model is therefore
+
+\begin{equation}
+    \dot{x}_m(t) = A_x x_m(t) + B_x \Delta i(t),
+\end{equation}
+
+\begin{equation}
+    y(t) = C_x x_m(t) + D_x \Delta i(t),
+\end{equation}
+
+where
+
+\begin{equation}
+    A_x =
+    \begin{bmatrix}
+        0 & 1 \\
+        k_1 & 0
+    \end{bmatrix},
+    \qquad
+    B_x =
+    \begin{bmatrix}
+        0 \\
+        k_2
+    \end{bmatrix},
+\end{equation}
+
+\begin{equation}
+    C_x =
+    \begin{bmatrix}
+        1 & 0
+    \end{bmatrix},
+    \qquad
+    D_x = 0.
+\end{equation}
+
+The coefficients are
+
+\begin{equation}
+    k_1 =
+    \frac{2K_m i_e^2}
+    {m\left(l - 2r - x_e\right)^3},
+    \qquad
+    k_2 =
+    \frac{2K_m i_e}
+    {m\left(l - 2r - x_e\right)^2}.
+\end{equation}
+
+\subsubsection{FDT mechanical model}
+
+Starting from the state-space linearized model of the mechanical subsystem
+
+\begin{align}
+    \dot{x}_m(t) &= A_x x_m(t) + B_x \Delta i(t), \\
+    y(t) &= C_x x_m(t) + D_x \Delta i(t),
+\end{align}
+
+the corresponding transfer function is obtained as
+
+\begin{equation}
+    G_x(s) =
+    \frac{\Delta X(s)}{\Delta I(s)}
+    =
+    C_x(sI - A_x)^{-1}B_x + D_x.
+\end{equation}
+
+Substituting the mechanical matrices gives
+
+\begin{equation}
+    G_x(s) =
+    \frac{k_2}{s^2 - k_1}.
+\end{equation}
+
+The poles of the mechanical subsystem are
+
+\[
+    p_{1,2} = \pm \sqrt{k_1} = \pm 52.9420
+\]
+
+Since one pole is positive, the mechanical subsystem is open-loop unstable.

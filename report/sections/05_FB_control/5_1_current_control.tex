@@ -1,4 +1,4 @@
-\subsection{Current control}
+\subsection{Current control design}
 % current control scheme
 \begin{figure}[H]
     \centering
@@ -87,30 +87,284 @@
     \label{fig:block_current_control_sat}
 \end{figure}
 
-\subsubsection{Controller design: BODE method}
-
-The first control task is the design of an inner current loop. The open-loop transfer function from the amplifier command voltage to the coil current is obtained from the RL model:
+\subsubsection{Controller design: Bode method}
+In the experimental setup, the voltage applied to the coil is obtained through the power amplifier, whose gain is denoted by \(K_g\).
+Therefore, the transfer function from the amplifier command to the coil current is
 \begin{equation}
-    G_i(s) = \frac{I(s)}{U(s)} = \frac{K_g}{Ls + R}.
+    K_g G_i(s) = \frac{K_g}{Ls+R}.
 \end{equation}
 
-A PI controller is selected to obtain zero steady-state error for constant current references:
+A PI controller is selected in order to obtain zero steady-state error for constant current references:
 \begin{equation}
-    R_i(s) = K_{p,i} + \frac{K_{i,i}}{s}.
+    R_i(s) = K_p + \frac{K_i}{s}
+           = K_p\left(1+\frac{1}{T_i s}\right),
+\end{equation}
+\textcolor{red}{WHY PI AND NOT PID?\\}
+with
+\begin{equation}
+    K_i = \frac{K_p}{T_i}.
 \end{equation}
 
-The resulting loop transfer function is
+The loop transfer function used for the frequency-domain design is therefore
 \begin{equation}
-    L_i(s) = R_i(s)G_i(s).
+    L_i(s) = R_i(s) K_g G_i(s).
 \end{equation}
 
-The closed-loop current transfer function is
+\paragraph{Requirements}
+The design is performed by imposing a desired crossover frequency \(\omega_c\) and a desired phase margin \(\varphi_m\).
+The objective of the inner current control is to give nearly istantaneus the current requested by the position controller. 
+Since the mechanical system is already instable, the current loop must not introduce a significant delay.
+Therefore it has to be significantly faster than the mechanical dynamics, the crossover frequency is chosen as
+
+\[
+    \omega_c = 10 \omega_m \simeq 529.42\ \mathrm{rad/s}
+\]
+
+where \(\omega_m\) is the characteristic frequency of the linearized mechanical subsystem.
+
+The second requirement is a phase margin of 
+\[
+\varphi_m = 90^\circ
+\]
+This beacouse the resistance of RL circuit can have very high variations due to temperature changes.
+
+\paragraph{Imposing requirements}
+The phase of the RL circuit at the crossover frequency is
+
 \begin{equation}
-    H_i(s) = \frac{R_i(s)G_i(s)}{1+R_i(s)G_i(s)}.
+\varphi_L(\omega_c)
+    = \angle L_i(j\omega_c)
+    = -\tan^{-1}\left(\frac{\omega_c L}{R}\right).
 \end{equation}
 
+The integral time constant of the PI controller is then selected in order to satisfy the desired phase margin:
+
+\begin{equation}
+\begin{aligned}
+T_i 
+&= \frac{1}
+{\omega_c \tan\left(180^\circ + \varphi_L(\omega_c) - \varphi_m\right)} \\
+&= 4.41 \cdot 10^{-2}\ \mathrm{s}.
+\end{aligned}
+\end{equation}
+
+Finally, the proportional gain is obtained by imposing unit magnitude of the loop transfer function at the crossover frequency:
+
+\begin{equation}
+| L_i | = 1 \Leftrightarrow  \left|R_i(j\omega_c)K_gG_i(j\omega_c)\right| = 1
+\end{equation}
+
+This gives
+
+\begin{equation}
+\begin{aligned}
+ K_p
+& = 
+    \frac{\sqrt{R^2+(\omega_c L)^2}}
+    {K_g \sqrt{1+\frac{1}{\omega_c^2T_i^2}}} \\
+& = 72.80            
+\end{aligned} 
+\end{equation}
+
+The integral gain is then computed as
+
+\begin{equation}
+\begin{aligned}
+    K_i 
+&= \frac{K_p}{T_i} \\
+& = 1650
+\end{aligned}
+\end{equation}
 
 \subsubsection{Anti Windup}
-\textcolor{blue}{GRAPH: anti windup}
+In order to protect the coil, a saturation on the voltage actuation is introduced. The coil can accept $\pm V_{\max} = 24\ \mathrm{V}$ as input.
 
-\subsubsection{Current control validation}
+Every time there is an integrator in the control loop and a saturation on the actuator, there is a risk of integrator windup.
+This phenomenon occurs when the controller integral term accumulates a large error during saturation, leading to overshoot, delay on the response,
+therefore instability when the system eventually comes out of saturation.
+
+When the actuator voltage saturates, the signal applied to the plant is no longer equal to the voltage requested by the controller. 
+To reduce the windup effect, an Internal Model Control anti-windup scheme is introduced. The difference between the unsaturated and saturated voltages is filtered through an internal model of the electrical plant and added to the measured current used in the feedback path:
+\begin{equation}
+    \Delta v(t) = v_c(t) - v_a(t),
+    \qquad
+    i_{\mathrm{fb}}(t) = i(t) + G_i(s)\Delta v(t),
+\end{equation}
+
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.98\textwidth}{!}{%
+    \begin{tikzpicture}[
+        auto,
+        node distance=1.15cm and 1.15cm,
+        >=Latex,
+        block/.style={
+            draw,
+            rectangle,
+            minimum width=1.5cm,
+            minimum height=1.0cm,
+            align=center
+        },
+        sum/.style={
+            draw,
+            circle,
+            minimum size=4mm,
+            inner sep=0pt
+        },
+        input/.style={coordinate},
+        output/.style={coordinate},
+        satblock/.style={
+            draw,
+            rectangle,
+            minimum width=2.1cm,
+            minimum height=1.45cm,
+            inner sep=0pt,
+            path picture={
+                % centered axes
+                \draw[->]
+                    ([xshift=-0.75cm,yshift=0cm]path picture bounding box.center) --
+                    ([xshift= 0.78cm,yshift=0cm]path picture bounding box.center);
+                \draw[->]
+                    ([xshift=0cm,yshift=-0.48cm]path picture bounding box.center) --
+                    ([xshift=0cm,yshift= 0.50cm]path picture bounding box.center);
+                % saturation characteristic
+                \draw[thick]
+                    ([xshift=-0.65cm,yshift=-0.32cm]path picture bounding box.center) --
+                    ([xshift=-0.25cm,yshift=-0.32cm]path picture bounding box.center) --
+                    ([xshift= 0.25cm,yshift= 0.32cm]path picture bounding box.center) --
+                    ([xshift= 0.65cm,yshift= 0.32cm]path picture bounding box.center);
+                % saturation limits
+                \draw[dashed]
+                    ([xshift=-0.68cm,yshift= 0.32cm]path picture bounding box.center) --
+                    ([xshift= 0.68cm,yshift= 0.32cm]path picture bounding box.center);
+                \draw[dashed]
+                    ([xshift=-0.68cm,yshift=-0.32cm]path picture bounding box.center) --
+                    ([xshift= 0.68cm,yshift=-0.32cm]path picture bounding box.center);
+                % labels
+                \node[font=\tiny, anchor=west] at
+                    ([xshift=0.70cm,yshift= 0.32cm]path picture bounding box.center)
+                    {$+V_{\max}$};
+                \node[font=\tiny, anchor=west] at
+                    ([xshift=0.70cm,yshift=-0.32cm]path picture bounding box.center)
+                    {$-V_{\max}$};
+                \node[font=\tiny, anchor=north east] at
+                    ([xshift=0cm,yshift=0cm]path picture bounding box.center)
+                    {$0$};
+            }
+        },
+        font=\small
+    ]
+
+    % Main loop nodes
+    \node[input] (input) {};
+    \node[sum, right=of input] (sum_e) {$+$};
+    \node[block, right=of sum_e] (controller) {$PI(s)$};
+    \node[block, right=of controller] (amp) {$K_g$};
+    \node[satblock, right=of amp] (sat) {};
+    \node[block, right=of sat] (plant) {$\widetilde{G}_i(s)$};
+    \node[output, right=2.0cm of plant] (output) {};
+
+    % IMC anti-windup nodes
+    \node[sum, below=1.55cm of sat] (sum_aw) {};
+    \node[block, right=1.25cm of sum_aw] (model) {${G}_i(s)$};
+    \node[sum, right=1.25cm of model] (sum_fb) {};
+
+    % Main loop connections
+    \draw[->] (input) -- node[pos=0.18, above] {$i_{\mathrm{ref}}(t)$} (sum_e);
+    \draw[->] (sum_e) -- node[above] {$e_i(t)$} (controller);
+    \draw[->] (controller) -- node[above] {} (amp);
+
+    \draw[->] (amp) -- 
+        coordinate[pos=0.55] (vcbranch)
+        node[above] {$v_c(t)$} 
+        (sat);
+
+    \draw[->] (sat) -- 
+        coordinate[pos=0.5] (vabranch)
+        node[above] {$v_a(t)$} 
+        (plant);
+
+    \draw[->] (plant) -- 
+        coordinate[pos=0.35] (imeasbranch)
+        node[pos=0.45, above] {$i(t)$} 
+        (output);
+
+    % IMC mismatch generation
+    \draw[->] (vcbranch) |- node[pos=0.93, left] {$+$} (sum_aw.west);
+    \draw[->] (vabranch) -- ++(0,-1.1) -| node[pos=0.92, right] {$-$} (sum_aw.north);
+
+    \draw[->] (sum_aw) -- node[above] {$\Delta v(t)$} (model);
+    \draw[->] (model) -- node[above] {$i_{\mathrm{aw}}(t)$} node[pos=0.90, below] {$+$} (sum_fb.west);
+
+    % Measured current contribution
+    \draw[->] (imeasbranch) -- ++(0,-0.55) -| node[pos=0.95, right] {$+$} (sum_fb.north);
+
+    % Feedback signal
+    \draw[->] (sum_fb.south) -- ++(0,-0.85)
+        node[pos=0.35, right] {$i_{\mathrm{fb}}(t)$}
+        -| node[pos=0.97, left] {$-$} (sum_e.south);
+
+    \end{tikzpicture}%
+    }
+    \caption{Current control loop with IMC anti-windup compensation}
+    \label{fig:block_current_control_imc_aw}
+\end{figure}
+
+
+
+\subsubsection{Closed-loop current dynamics}
+
+The closed-loop transfer function of the current loop is
+\begin{equation}
+    H_i(s)
+    =
+    \frac{R_i(s)K_gG_i(s)}
+    {1+R_i(s)K_gG_i(s)}.
+\end{equation}
+
+With the designed PI controller, MATLAB gives the following closed-loop transfer function:
+\begin{equation}
+H_i(s)
+=
+\frac{
+529.4s^2 + 2.4 \times 10^4 s + 2.72 \times 10^5
+}{
+s^3 + 574.8s^2 + 2.451 \times 10^4 s + 2.72 \times 10^5
+}.
+\end{equation}
+
+The poles of the closed-loop current dynamics are
+\begin{equation}
+p_{H_i}
+=
+\left\{
+-529.42,\,
+-22.67,\,
+-22.67
+\right\}.
+\end{equation}
+
+The two slow poles at $-22.67$ are approximately cancelled by the PI zero and by the electrical pole of the RL circuit.
+For this reason, the input-output behaviour of the current loop can be reduced to an equivalent first-order dynamics:
+\begin{equation}
+\begin{aligned}
+H_i(s)
+&\simeq \frac{\omega_c}{s+\omega_c} \\
+&\simeq \frac{529.42}{s+529.42}.
+\end{aligned}
+\end{equation}
+
+Thus, although the non-reduced transfer function is formally of third order, the effective closed-loop current dynamics is well approximated by a first-order system with pole
+\begin{equation}
+p_i \simeq -529.42~\mathrm{rad/s}.
+\end{equation}
+
+This approximation is useful for the design of the outer position controller, since the current loop can be considered much faster than the mechanical subsystem.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{../img/BODE_Hi.png}
+    \caption{Bode diagram of $H_i(s)$}
+    \label{fig:bode_hi}
+\end{figure}

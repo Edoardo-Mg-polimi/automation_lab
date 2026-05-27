@@ -42,15 +42,15 @@ G_i
 pole(G_i)
 zero(G_i)
 
-%figure
-%bode(G_i)
-%grid on
-%title('Diagramma di Bode di G_i')
+figure
+bode(G_i)
+grid on
+title('Diagramma di Bode di G_i')
 
-%figure
-%nyquist(G_i)
-%grid on
-%title('Diagramma di Nyquist di G_i')
+figure
+nyquist(G_i)
+grid on
+title('Diagramma di Nyquist di G_i')
 
 %% 2) Modello Forze
 
@@ -70,12 +70,12 @@ C_p = [1, 0];
 D_p = 0;
 
 SS_p = ss(A_p, B_p, C_p, D_p);
-G_p = tf(SS_p);
-[G_p_num, G_p_den] = tfdata(G_p, 'v');
+G_x = tf(SS_p);
+[G_p_num, G_p_den] = tfdata(G_x, 'v');
 disp('linearized model tf')
-G_p
-pole(G_p)
-zero(G_p)
+G_x
+pole(G_x)
+zero(G_x)
 
 %checking reachability of linearized system
 Mr = ctrb(A_p,B_p);
@@ -95,7 +95,7 @@ end
 
 %% 3) Regolatore Corrente PID
 
-p = pole(G_p); % poles of the position plant
+p = pole(G_x); % poles of the position plant
 wm = abs(p(1));
 %wc = 2*wm;
 wc = 180;
@@ -120,7 +120,7 @@ zero(H_i)
 
 %% 4) Regolatore Posizione PID
 
-G_out = H_i*G_p %current closed loop tf * position plant
+G_out = H_i*G_x %current closed loop tf * position plant
 pole(G_out)
 zero(G_out)
 %bode(G_out)

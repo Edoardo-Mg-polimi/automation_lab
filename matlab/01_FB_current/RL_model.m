@@ -36,17 +36,21 @@ Kb = 2.83e-3; %[m/V] ball position sensitivity
 %% 1) Modello circuito RL
 fprintf(' 1) MODELLO CIRCUITO RL\n');
 s = tf('s');
-wp = R/L;% unico polo di T(s) calcolabile anche con funzione pole
+wi = R/L;% unico polo di T(s) calcolabile anche con funzione pole
+tau_i = 1/wi;
 G_i = 1/(s*L +R)
 [G_i_num, G_i_den]   = tfdata(G_i, 'v');
 G_i_num = G_i_num(2);
 
+
 fprintf("amplificatore: Kg=%f\n", Kg);
+fprintf("Pole: %f, Tau: %f \n", wi, tau_i);
 
 figure
 bode(G_i)
 grid on
 title('Bode G_i(s) circito RL')
+
 
 figure
 nyquist(G_i)
@@ -79,22 +83,24 @@ xd_e = 0;
 i_e = sqrt((m*g/km) * (x_e + 2*r -l)^2); % corrente di equilibrio ie(xe)
 
 v_e = i_e * R;
+fprintf("Tensione di equilibrio: v_e = %f \n", v_e);
 
 k1 = (2 * km * i_e^2)/(m * (l -2*r -x_e)^3);
 k2 = (2 * km * i_e)/(m * (l-2*r -x_e)^2);
+fprintf("Costanti linearizzazione: k1=%f k2=%f \n",k1, k2);
 
 % 2.1 - TF
 G_x = k2/(s^2 -k1);
 [numW, denW]   = tfdata(G_x, 'v');
 
-p = pole(G_x);   % poli
+p = pole(G_x)   % poli
 wm = abs(p(1));
 fprintf("Frequenza naturale G_x: wm=%f", wm);
 
 %% 3) BODE syntesis 
 wc = 10*wm;
 phase_m = 90; %margine di fase in deg
-fprintf("Requirements: wc=%f , phase margin=%f \n", wc, phase_m);
+fprintf("\n Requirements: wc=%f , phase margin=%f \n", wc, phase_m);
 
 phiG_deg = -atand((wc*L)/R);%fase a omega c
 Ti = 1/(wc * tand(180 + phiG_deg -phase_m));
@@ -140,9 +146,9 @@ poles_Hi = pole(H_i)
 figure
 bode(H_i)
 grid on
-title('Bode H_i(s) anello chiuso')
+title('Bode H_i(s) closed loop')
 
 figure
 nyquist(H_i)
 grid on
-title('Nyquist H_i(s) anello chiuso')
+title('Nyquist H_i(s) closed loop')
