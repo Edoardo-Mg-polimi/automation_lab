@@ -15,7 +15,7 @@ labels = {
     'FB 20 rad/s'
 };
 
-w = 9; % [rad/s]
+w = 30; % [rad/s]
 lowPassCutoffHz = w/(2*pi); % [Hz] REGOLA IL FILTRO
 
 for k = 1:numel(files)

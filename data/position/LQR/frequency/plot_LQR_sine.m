@@ -13,7 +13,7 @@ labels = {
     'LQR 15 rad/s'
 };
 
-w = 3; % [rad/s]
+w = 20; % [rad/s]
 lowPassCutoffHz = w/(2*pi); % [Hz] REGOLA IL FILTRO
 
 for k = 1:numel(files)
