@@ -1,25 +1,39 @@
 clear; close all; clc;
 
 scriptDir = fileparts(mfilename('fullpath'));
-filePath = fullfile(scriptDir, '..', 'PP_freqvalid1rads_lastlesson.mat');
+files = {
+    fullfile(scriptDir, 'FB_freqvalid1rads_lastlesson.mat')
+    fullfile(scriptDir, 'FB_freqvalid3rads_lastlesson.mat')
+    fullfile(scriptDir, 'FB_freqvalid6rads_lastlesson.mat')
+    fullfile(scriptDir, 'FB_freqvalid20rads_lastlesson.mat')
+};
+
+labels = {
+    'FB 1 rad/s'
+    'FB 3 rad/s'
+    'FB 6 rad/s'
+    'FB 20 rad/s'
+};
 
 w = 9; % [rad/s]
 lowPassCutoffHz = w/(2*pi);%[Hz] REGOLA IL FILTRO
 
-[t, x_ref, x_meas] = loadFrequencySignal(filePath);
-x_meas_filt = lowpassNumeric(t, x_meas, lowPassCutoffHz);
+for k = 1:numel(files)
+    [t, x_ref, x_meas] = loadFrequencySignal(files{k});
+    x_meas_filt = lowpassNumeric(t, x_meas, lowPassCutoffHz);
 
-figure('Color', 'w');
-hold on;
-grid on;
+    figure('Color', 'w', 'Name', labels{k});
+    hold on;
+    grid on;
 
-plot(t, x_ref, 'LineWidth', 1.4);
-plot(t, x_meas_filt, 'LineWidth', 1.4);
+    plot(t, x_ref, 'LineWidth', 1.4);
+    plot(t, x_meas_filt, 'LineWidth', 1.4);
 
-xlabel('Time [s]');
-ylabel('Measured position [m]');
-title('PP frequency validation - low-pass filtered measured position');
-legend({'Position reference', 'Measured position (filtered)'}, 'Location', 'best');
+    xlabel('Time [s]');
+    ylabel('Position [m]');
+    title([labels{k}, ' - low-pass filtered measured position']);
+    legend({'Position reference', 'Measured position (filtered)'}, 'Location', 'best');
+end
 
 function [t, x_ref, x_meas] = loadFrequencySignal(filePath)
     S = load(filePath);
