@@ -16,11 +16,11 @@ labels = {
 };
 
 w = 9; % [rad/s]
-lowPassCutoffHz = w/(2*pi);%[Hz] REGOLA IL FILTRO
+lowPassCutoffHz = w/(2*pi); % [Hz] REGOLA IL FILTRO
 
 for k = 1:numel(files)
     [t, x_ref, x_meas] = loadFrequencySignal(files{k});
-    x_meas_filt = lowpassNumeric(t, x_meas, lowPassCutoffHz);
+    [x_meas_filt, filtInfo] = lowpassNumeric(t, x_meas, lowPassCutoffHz);
 
     figure('Color', 'w', 'Name', labels{k});
     hold on;
@@ -34,6 +34,10 @@ for k = 1:numel(files)
     title([labels{k}, ' - low-pass filtered measured position']);
     legend({'Position reference', 'Measured position (filtered)'}, 'Location', 'best');
 end
+
+% Grafico del filtro passa basso
+plotFilterResponse(filtInfo);
+
 
 function [t, x_ref, x_meas] = loadFrequencySignal(filePath)
     S = load(filePath);
@@ -53,7 +57,8 @@ function [t, x_ref, x_meas] = loadFrequencySignal(filePath)
     x_meas = double(data(3, :));
 end
 
-function x_filt = lowpassNumeric(t, x, cutoffHz)
+
+function [x_filt, filtInfo] = lowpassNumeric(t, x, cutoffHz)
     t = double(t(:));
     x = double(x(:));
 
@@ -75,4 +80,62 @@ function x_filt = lowpassNumeric(t, x, cutoffHz)
     x_filt = filtfilt(b, a, x);
 
     x_filt = x_filt.';
+
+    % Salvo le informazioni del filtro per plottarlo dopo
+    filtInfo.b = b;
+    filtInfo.a = a;
+    filtInfo.fs = fs;
+    filtInfo.cutoffHz = cutoffHz;
+    filtInfo.order = order;
+end
+
+
+function plotFilterResponse(filtInfo)
+    b = filtInfo.b;
+    a = filtInfo.a;
+    fs = filtInfo.fs;
+    cutoffHz = filtInfo.cutoffHz;
+    order = filtInfo.order;
+
+    n = 4096;
+
+    % Risposta in frequenza del filtro
+    [H, f] = freqz(b, a, n, fs);
+
+    % Modulo del filtro applicato una volta
+    magSingleDb = 20*log10(abs(H));
+
+    % Modulo effettivo con filtfilt
+    % filtfilt applica il filtro due volte, avanti e indietro
+    magFiltfiltDb = 20*log10(abs(H).^2);
+
+    % Fase del filtro applicato una volta
+    phaseSingleDeg = unwrap(angle(H)) * 180/pi;
+
+    figure('Color', 'w', 'Name', 'Low-pass filter response');
+
+    subplot(2,1,1);
+    hold on;
+    grid on;
+
+    semilogx(f(2:end), magSingleDb(2:end), 'LineWidth', 1.4);
+    semilogx(f(2:end), magFiltfiltDb(2:end), '--', 'LineWidth', 1.4);
+    xline(cutoffHz, ':', sprintf('Cutoff = %.2f Hz', cutoffHz), ...
+        'LabelOrientation', 'horizontal');
+
+    xlabel('Frequency [Hz]');
+    ylabel('Magnitude [dB]');
+    title(sprintf('Low-pass Butterworth filter - order %d', order));
+    legend({'Single pass', 'Effective with filtfilt'}, 'Location', 'best');
+
+    subplot(2,1,2);
+    hold on;
+    grid on;
+
+    semilogx(f(2:end), phaseSingleDeg(2:end), 'LineWidth', 1.4);
+    yline(0, '--');
+
+    xlabel('Frequency [Hz]');
+    ylabel('Phase [deg]');
+    title('Single-pass phase response');
 end
