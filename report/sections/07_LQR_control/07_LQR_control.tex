@@ -184,8 +184,8 @@
     \node[right, xshift=0.05cm, yshift=0.2cm] at (obs_x_out) {$x$};
 
     % =========================================================
-    % Observer outputs
-    % x_hat shown but not used by PP
+    % Kalman filter outputs
+    % x_hat shown but not used by LQR
     % xdot_hat sent to the MUX
     % =========================================================
 
@@ -215,7 +215,7 @@
 
     \end{tikzpicture}
     }
-    \caption{LQR control scheme with integral action and state observer.}
+    \caption{LQR control scheme with integral action and Kalman filter.}
     \label{fig:lqr_integral_KF}
 \end{figure}
 

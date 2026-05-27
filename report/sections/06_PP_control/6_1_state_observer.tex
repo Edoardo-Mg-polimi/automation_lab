@@ -1,0 +1,145 @@
+\subsection{State observer}
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.92\textwidth}{!}{%
+    \begin{tikzpicture}[
+        >=Latex,
+        line/.style={
+            draw,
+            thick,
+            -{Latex[length=2.3mm,width=1.7mm]}
+        },
+        block/.style={
+            draw,
+            rectangle,
+            minimum width=3.1cm,
+            minimum height=1.35cm,
+            align=center,
+            thick
+        },
+        smallblock/.style={
+            draw,
+            rectangle,
+            minimum width=0.8cm,
+            minimum height=0.65cm,
+            align=center,
+            thick
+        },
+        sum/.style={
+            draw,
+            circle,
+            minimum size=5mm,
+            inner sep=0pt,
+            thick
+        },
+        mux/.style={
+            draw,
+            rectangle,
+            fill=black,
+            minimum width=0.11cm,
+            minimum height=1.6cm,
+            inner sep=0pt
+        },
+        lab/.style={
+            font=\small
+        }
+    ]
+
+    % Coordinates
+    \coordinate (xin)  at (0,1.2);
+    \coordinate (iin)  at (0,-1.2);
+
+    \node[sum] (sumx) at (1.8,1.2) {};
+    \node[sum] (sumi) at (1.8,-1.2) {};
+
+    \node[smallblock] (xein) at (1.8,2.45) {$x_e$};
+    \node[smallblock] (iein) at (1.8,-2.45) {$i_e$};
+
+    \node[mux] (muxin) at (3.5,0) {};
+
+    \node[block] (obs) at (7.4,0) {
+        $\begin{aligned}
+            \dot{\hat{x}}_{obs} &=
+            A_{obs}\hat{x}_{obs} + B_{obs}
+            \begin{bmatrix}
+            \Delta x_{\mathrm{meas}}\\
+            \Delta i_{\mathrm{meas}}
+            \end{bmatrix}
+            \\[1mm]
+            y_{obs} &= C_{obs}\hat{x}_{obs}
+        \end{aligned}$
+    };
+
+    \node[mux] (demux) at (11.5,0) {};
+
+    \node[sum] (sumout) at (13.5,1.2) {};
+    \node[smallblock] (xeout) at (13.5,2.45) {$x_e$};
+
+    \coordinate (xout) at (15.5,1.2);
+    \coordinate (vout) at (15.5,-1.2);
+
+    % Input labels
+    \node[lab, left=0.15cm] at (xin) {$x_{\mathrm{meas}}$};
+    \node[lab, left=0.15cm] at (iin) {$i_{\mathrm{meas}}$};
+
+    % Sum signs, input side
+    \node at ($(sumx)+(-0.3,0.25)$) {\scriptsize $+$};
+    \node at ($(sumx)+(0.3,0.45)$) {\scriptsize $-$};
+
+    \node at ($(sumi)+(-0.3,0.25)$) {\scriptsize $+$};
+    \node at ($(sumi)+(0.3,-0.45)$) {\scriptsize $-$};
+
+    % Sum signs, output side
+    \node at ($(sumout)+(-0.3,0.12)$) {\scriptsize $+$};
+    \node at ($(sumout)+(0.3,0.45)$) {\scriptsize $+$};
+
+    % Input connections
+    \draw[line] (xin) -- (sumx.west);
+    \draw[line] (iin) -- (sumi.west);
+
+    \draw[line] (xein.south) -- node[lab, right] {} (sumx.north);
+    \draw[line] (iein.north) -- node[lab, right] {} (sumi.south);
+
+    % To mux
+    \draw[line] (sumx.east) -- node[lab, above] {} ($(muxin.west)+(0,0.45)$);
+    \draw[line] (sumi.east) -- node[lab, below] {} ($(muxin.west)+(0,-0.45)$);
+
+    % Observer input
+    \draw[line] (muxin.east) -- node[lab, above] {} (obs.west);
+
+    % Observer output
+    \draw[line] (obs.east) -- node[lab, above] {} (demux.west);
+
+    % Output position branch
+    \draw[line] ($(demux.east)+(0,0.45)$) -- node[lab, above] {$\Delta\hat{x}$} (sumout.west);
+    \draw[line] (xeout.south) -- node[lab, right] {} (sumout.north);
+    \draw[line] (sumout.east) -- node[lab, above] {$\hat{x}$} (xout);
+    \node[lab, right=0.15cm] at (xout) {estimated position};
+
+    % Output speed branch
+    \draw[line] ($(demux.east)+(0,-0.45)$) -- node[lab, below] {$\hat{\dot{x}}$} (vout);
+    \node[lab, right=0.15cm] at (vout) {estimated speed};
+
+    \end{tikzpicture}%
+    }
+    \caption{State observer with measured position and current expressed as deviations from the equilibrium values.}
+    \label{fig:state_observer}
+\end{figure}
+
+\textcolor{red}{EXPLAIN WHY WE NEED AN OBSERVER}
+A Luenberger observer is used to estimate $\Delta x$ and $\Delta \dot{x}$ from the position measurement. In \texttt{SS\_model\_PP.m} the observer poles are placed at
+\begin{equation}
+    p_{obs} = \{-500, -600\}.
+\end{equation}
+The observer gain is computed with
+\begin{equation}
+    L_{obs} = \mathrm{place}(A_x^T, C_x^T, p_{obs})^T.
+\end{equation}
+
+\textcolor{red}{ACKERMANN FORMULA}
+
+The observer dynamics are
+\begin{equation}
+    \dot{\hat{\vect{x}}} = (A_x - L_{obs} C_x)\hat{\vect{x}} + B_x \Delta i_{ref} + L_{obs} \Delta x.
+\end{equation}
