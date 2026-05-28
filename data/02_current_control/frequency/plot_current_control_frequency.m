@@ -16,9 +16,11 @@ for fileIdx = 1:numel(matFiles)
     filePath = fullfile(matFiles(fileIdx).folder, matFiles(fileIdx).name);
     [t, signals] = loadValidationMatrix(filePath);
     labels = buildLabels(size(signals, 1), signalLabels);
+    metrics = computeFrequencyMetrics(t, signals(1, :), signals(2, :));
 
     figure('Color', 'w', 'Name', erase(matFiles(fileIdx).name, '.mat'));
     plotValidationSeries(t, signals, labels, sprintf('Current control frequency validation - %s', erase(matFiles(fileIdx).name, '.mat')));
+    printFrequencyMetrics(matFiles(fileIdx).name, metrics);
 end
 
 function [t, signals] = loadValidationMatrix(filePath)
@@ -63,4 +65,83 @@ function plotValidationSeries(t, signals, labels, plotTitle)
     ylabel('Current');
     legend({labels{1}, labels{2}}, 'Location', 'best');
     hold off;
+end
+
+function metrics = computeFrequencyMetrics(t, referenceSignal, measuredSignal)
+    t = double(t(:).');
+    referenceSignal = double(referenceSignal(:).');
+    measuredSignal = double(measuredSignal(:).');
+
+    nSamples = min([numel(t), numel(referenceSignal), numel(measuredSignal)]);
+    metrics = struct('attenuationDb', NaN, 'phaseShiftDeg', NaN, 'dominantFrequencyHz', NaN);
+
+    if nSamples < 8
+        return;
+    end
+
+    t = t(1:nSamples);
+    referenceSignal = referenceSignal(1:nSamples);
+    measuredSignal = measuredSignal(1:nSamples);
+
+    validMask = isfinite(t) & isfinite(referenceSignal) & isfinite(measuredSignal);
+    if nnz(validMask) < 8
+        return;
+    end
+
+    t = t(validMask);
+    referenceSignal = referenceSignal(validMask);
+    measuredSignal = measuredSignal(validMask);
+
+    startIdx = max(1, floor(0.5 * numel(t)));
+    t = t(startIdx:end);
+    referenceSignal = referenceSignal(startIdx:end);
+    measuredSignal = measuredSignal(startIdx:end);
+
+    if numel(t) < 8
+        return;
+    end
+
+    dt = median(diff(t));
+    if ~isfinite(dt) || dt <= 0
+        return;
+    end
+
+    referenceSignal = referenceSignal - mean(referenceSignal, 'omitnan');
+    measuredSignal = measuredSignal - mean(measuredSignal, 'omitnan');
+
+    nfft = 2 ^ nextpow2(numel(t));
+    referenceSpectrum = fft(referenceSignal, nfft);
+    measuredSpectrum = fft(measuredSignal, nfft);
+    freqAxis = (0:nfft - 1) * (1 / (dt * nfft));
+
+    positiveBins = 2:max(2, floor(nfft / 2));
+    [~, maxIdx] = max(abs(referenceSpectrum(positiveBins)));
+    dominantBin = positiveBins(maxIdx);
+
+    referenceComponent = referenceSpectrum(dominantBin);
+    measuredComponent = measuredSpectrum(dominantBin);
+
+    if abs(referenceComponent) <= eps
+        return;
+    end
+
+    metrics.dominantFrequencyHz = freqAxis(dominantBin);
+    metrics.attenuationDb = 20 * log10(abs(measuredComponent) / abs(referenceComponent));
+    phaseShiftDeg = rad2deg(angle(measuredComponent) - angle(referenceComponent));
+    metrics.phaseShiftDeg = mod(phaseShiftDeg + 180, 360) - 180;
+end
+
+function printFrequencyMetrics(fileName, metrics)
+    fprintf('\n%s\n', fileName);
+    fprintf('  Dominant frequency: %s Hz\n', format_metric(metrics.dominantFrequencyHz, '%.4g'));
+    fprintf('  Attenuation: %s dB\n', format_metric(metrics.attenuationDb, '%.4g'));
+    fprintf('  Phase shift: %s deg\n', format_metric(metrics.phaseShiftDeg, '%.4g'));
+end
+
+function textValue = format_metric(value, formatSpec)
+    if isnan(value)
+        textValue = 'N/A';
+    else
+        textValue = sprintf(formatSpec, value);
+    end
 end
