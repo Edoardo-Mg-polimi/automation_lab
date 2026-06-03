@@ -1,4 +1,10 @@
-\subsubsection{Nonlinear state-space model}
+\subsection{Nonlinear state-space model}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{../img/models/NonLinear_Model_of_the_System.png}
+    \caption{Nonlinear model of the system}
+    \label{fig:nonlinear_model}
+\end{figure}
 
 The nonlinear model is written by choosing the state vector
 \begin{equation*}
@@ -12,10 +18,14 @@ Using the amplifier command $u$ as input, the nonlinear state-space model is
 \begin{equation}
 \begin{cases}
     \dot{x}_1 = x_2 \\[2mm]
-    \dot{x}_2 = g - \dfrac{K_m}{m}\dfrac{x_3^2}{x_1^2} \\[2mm]
+    \dot{x}_2 = g - \dfrac{K_m}{m}\dfrac{x_3^2}{d^2} \\[2mm]
     \dot{x}_3 = -\dfrac{R}{L}x_3 + \dfrac{K_g}{L}u \\[2mm]
     y = x_1
 \end{cases}
 \label{eq:nonlinear_ss}
 \end{equation}
+
+
+
+
 

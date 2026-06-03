@@ -118,15 +118,120 @@ In the implemented controllers, it is important to distinguish absolute variable
 
 
 \subsubsection{Linearization}
-The nonlinear model is linearized around the equilibrium point $\left(x_e,0,i_e,u_e\right)$. Using deviation variables, the linearized model is
-
-The design uses deviation variables around the equilibrium point. With the closed current loop bandwidth $\omega_i$, the extended state is
+The nonlinear model is linearized around the equilibrium point $\left(x_e,0,i_e,u_e\right)$. The design uses deviation variables around the equilibrium point. With the closed current loop bandwidth $\omega_i$, the extended state is
 \begin{equation*}
     \vect{x} = \begin{bmatrix} \Delta x & \Delta \dot{x} & \Delta i \end{bmatrix}^T,
 \end{equation*}
 the input is $\Delta i_{ref}$, and the measured outputs are $\Delta x$ and $\Delta i$.
 
-\textcolor{red}{ALL THE LINEARIZATION CALCULUS}
+Let
+\begin{equation}
+    d(x) = l - x - 2r,
+    \qquad
+    d_e = d(x_e) = l - x_e - 2r.
+\end{equation}
+The nonlinear mechanical acceleration can be written as
+\begin{equation}
+    f(x,i) =
+    \frac{K_m}{m}\frac{i^2}{\left(l-x-2r\right)^2} - g
+    =
+    \frac{K_m}{m}\frac{i^2}{d^2(x)} - g .
+\end{equation}
+
+The first-order Taylor expansion around the equilibrium point $\left(x_e,i_e\right)$ is
+\begin{equation}
+    f(x,i) \simeq
+    f(x_e,i_e)
+    +
+    \left.\frac{\partial f}{\partial x}\right|_e \Delta x
+    +
+    \left.\frac{\partial f}{\partial i}\right|_e \Delta i .
+\end{equation}
+
+At equilibrium the magnetic force balances the weight, therefore
+\begin{equation}
+    f(x_e,i_e) =
+    \frac{K_m}{m}\frac{i_e^2}{d_e^2} - g = 0.
+\end{equation}
+The constant term of the Taylor expansion is therefore cancelled.
+
+The partial derivative with respect to the position is
+\begin{equation}
+\begin{aligned}
+    \frac{\partial f}{\partial x}
+    &=
+    \frac{K_m}{m} i^2
+    \frac{\partial}{\partial x}
+    \left(l-x-2r\right)^{-2} \\[1mm]
+    &=
+    \frac{K_m}{m} i^2
+    \left[-2\left(l-x-2r\right)^{-3}(-1)\right] \\[1mm]
+    &=
+    \frac{2K_m i^2}{m\left(l-x-2r\right)^3}.
+\end{aligned}
+\end{equation}
+Evaluated at the equilibrium point:
+\begin{equation}
+    \left.\frac{\partial f}{\partial x}\right|_e
+    =
+    \frac{2K_m i_e^2}{m d_e^3}
+    = k_1 .
+\end{equation}
+
+The partial derivative with respect to the current is
+\begin{equation}
+\begin{aligned}
+    \frac{\partial f}{\partial i}
+    &=
+    \frac{K_m}{m}
+    \frac{\partial}{\partial i}
+    \left(\frac{i^2}{\left(l-x-2r\right)^2}\right) \\[1mm]
+    &=
+    \frac{2K_m i}{m\left(l-x-2r\right)^2}.
+\end{aligned}
+\end{equation}
+Evaluated at the equilibrium point:
+\begin{equation}
+    \left.\frac{\partial f}{\partial i}\right|_e
+    =
+    \frac{2K_m i_e}{m d_e^2}
+    = k_2 .
+\end{equation}
+
+Therefore the linearized mechanical dynamics are
+\begin{equation}
+    \Delta \ddot{x}
+    =
+    k_1 \Delta x + k_2 \Delta i.
+\end{equation}
+
+The kinematic equation is already linear:
+\begin{equation}
+    \frac{\dd}{\dd t}\Delta x = \Delta \dot{x}.
+\end{equation}
+
+Finally, the inner current loop is approximated as a first-order closed-loop system from the current
+reference variation to the current variation:
+\begin{equation}
+    \frac{\Delta I(s)}{\Delta I_{ref}(s)}
+    =
+    \frac{\omega_i}{s+\omega_i}.
+\end{equation}
+In the time domain this gives
+\begin{equation}
+    \Delta \dot{i}
+    =
+    -\omega_i \Delta i + \omega_i \Delta i_{ref}.
+\end{equation}
+
+Collecting the three linearized equations:
+\begin{equation}
+\begin{cases}
+    \dfrac{\dd}{\dd t}\Delta x = \Delta \dot{x} \\[1mm]
+    \Delta \ddot{x} = k_1 \Delta x + k_2 \Delta i \\[1mm]
+    \Delta \dot{i} = -\omega_i \Delta i + \omega_i \Delta i_{ref}
+\end{cases}
+\end{equation}
 
 
 Defining

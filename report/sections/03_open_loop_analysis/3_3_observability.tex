@@ -15,7 +15,35 @@ The system is observable if
     \mathrm{rank}(\mathcal{O}) = n.
 \end{equation}
 
+For the selected output matrix, position and current are directly measured:
+\begin{equation}
+    y =
+    \begin{bmatrix}
+        \Delta x \\
+        \Delta i
+    \end{bmatrix}.
+\end{equation}
+The velocity state is not directly measured, but it appears in the first derivative of the position
+measurement. The observability matrix contains the independent rows
+\begin{equation}
+    \begin{bmatrix} 1 & 0 & 0 \end{bmatrix},
+    \qquad
+    \begin{bmatrix} 0 & 0 & 1 \end{bmatrix},
+    \qquad
+    \begin{bmatrix} 0 & 1 & 0 \end{bmatrix},
+\end{equation}
+which are sufficient to reconstruct the three states.
+
+The numerical result is
+\begin{equation}
+    \mathrm{rank}(\mathcal{O}) = 3.
+\end{equation}
+Therefore the extended model is observable. This justifies the use of state-estimation strategies in
+the following controllers, where the velocity is reconstructed from the measured position and current
+signals.
+
 \begin{lstlisting}[style=matlabstyle,caption={Observability check.}]
-Mo = obsv(A_ext, C_ext);
+Mo = obsv(A, C);
 rank_Mo = rank(Mo);
+disp(rank_Mo);
 \end{lstlisting}

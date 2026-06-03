@@ -5,7 +5,36 @@ The open-loop poles are obtained from the eigenvalues of the state matrix $A$:
     \lambda_i = \mathrm{eig}(A).
 \end{equation}
 
-Because the mechanical dynamics of the magnetic levitation system are unstable, at least one pole is expected to be in the right half-plane. This confirms that feedback control is required to keep the ball levitated around the selected equilibrium point.
+For the extended model, the eigenvalues are
+\begin{equation}
+    \lambda(A) =
+    \left\{
+        +52.94,\;
+        -52.94,\;
+        -529.42
+    \right\}\ \mathrm{rad/s}.
+    \label{eq:open_loop_poles}
+\end{equation}
+
+The pair $\pm 52.94\ \mathrm{rad/s}$ is associated with the mechanical subsystem
+\begin{equation}
+    G_x(s) = \frac{k_2}{s^2-k_1},
+\end{equation}
+whose poles are located at $\pm \sqrt{k_1}$. The positive pole is a direct consequence of the
+open-loop magnetic levitation dynamics: if the ball moves away from the equilibrium point, the
+magnetic force variation does not naturally restore the position. Therefore the equilibrium is unstable
+without feedback.
+
+The third pole, $-529.42\ \mathrm{rad/s}$, is introduced by the closed current loop approximation. This
+pole is stable and significantly faster than the mechanical unstable pole. Hence, the open-loop
+instability of the extended plant is entirely due to the mechanical position dynamics.
+
+Since one eigenvalue has positive real part, the open-loop plant is unstable:
+\begin{equation}
+    \max_i \Re\{\lambda_i\} = 52.94 > 0.
+\end{equation}
+This confirms that a position controller is necessary to keep the ball levitated around the selected
+equilibrium point.
 
 \begin{lstlisting}[style=matlabstyle,caption={Open-loop pole computation in MATLAB.}]
 poles_ol = eig(A_ext);

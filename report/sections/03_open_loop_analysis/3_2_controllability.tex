@@ -2,7 +2,10 @@
 
 The controllability matrix is
 \begin{equation}
-    \mathcal{C} = \begin{bmatrix} B & AB & A^2B \end{bmatrix}.
+    \mathcal{C} =
+    \begin{bmatrix}
+        B & A B & A^2B
+    \end{bmatrix}.
 \end{equation}
 
 The linearized system is controllable if
@@ -11,7 +14,33 @@ The linearized system is controllable if
 \end{equation}
 where $n$ is the number of states.
 
+For the extended model, $n=3$. Substituting the structure of $A$ and $B$ gives
+\begin{equation}
+    \mathcal{C} =
+    \begin{bmatrix}
+        0 & 0 & k_2\omega_i \\
+        0 & k_2\omega_i & -k_2\omega_i^2 \\
+        \omega_i & -\omega_i^2 & \omega_i^3
+    \end{bmatrix}.
+\end{equation}
+
+Its determinant is
+\begin{equation}
+    \det(\mathcal{C}) = -k_2^2\omega_i^3.
+\end{equation}
+Since $k_2 \neq 0$ and $\omega_i \neq 0$, the determinant is non-zero. Therefore the model is fully
+controllable.
+
+The numerical check gives
+\begin{equation}
+    \mathrm{rank}(\mathcal{C}) = 3.
+\end{equation}
+This means that the current reference input $\Delta i_{ref}$ can affect all three states of the extended
+model. In particular, although the input acts directly only on the current state, the current variation
+acts on the acceleration equation and therefore controls the ball position and velocity.
+
 \begin{lstlisting}[style=matlabstyle,caption={Controllability check.}]
 Mr = ctrb(A_ext, B_ext);
 rank_Mr = rank(Mr);
+disp(rank_Mr);
 \end{lstlisting}

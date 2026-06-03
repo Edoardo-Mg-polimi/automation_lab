@@ -1,14 +1,63 @@
 \subsection{Operating range and constraints}
 
-The main physical constraints are the finite travel of the ball, the maximum continuous coil current and the voltage limit of the amplifier. These constraints are relevant both for simulation and experimental implementation, because a controller that performs well in the linear model may still fail when the reference or the control effort pushes the system outside the admissible region.
+The main physical constraints are the finite travel of the ball, the maximum continuous coil current and
+the voltage limit of the amplifier. These constraints are relevant both for simulation and experimental
+implementation, because a controller that performs well in the linear model may still fail when the
+reference or the control effort pushes the system outside the admissible region.
 
 The most important constraints considered in the controller design are
 \begin{equation}
     0 \leq i(t) \leq i_{max},
     \qquad
-    |u(t)| \leq u_{max},
+    |v_c(t)| \leq V_{max},
     \qquad
     x_{min} \leq x(t) \leq x_{max}.
 \end{equation}
 
-The current saturation is particularly relevant when integral action is used, because actuator saturation can produce integrator windup if no protection strategy is included.
+The nominal limits used in the project are
+\begin{equation}
+    i_{max} = 3\ \mathrm{A},
+    \qquad
+    V_{max} = 24\ \mathrm{V},
+    \qquad
+    0 \leq x(t) \leq T_b = 14\ \mathrm{mm}.
+\end{equation}
+Since the equilibrium point is selected at the middle of the admissible travel,
+\begin{equation}
+    x_e = 7\ \mathrm{mm},
+\end{equation}
+the maximum geometric displacement around the linearization point is
+\begin{equation}
+    -7\ \mathrm{mm} \leq \Delta x(t) \leq 7\ \mathrm{mm}.
+\end{equation}
+
+However, the linearized model is reliable only for smaller variations around the equilibrium point.
+For this reason, the references used for controller validation are kept in the millimetre range and the
+nonlinear simulation is used as an additional check before applying the controller to the real system.
+
+The equilibrium current at the selected point is
+\begin{equation}
+    i_e = 0.707\ \mathrm{A}.
+\end{equation}
+Therefore the absolute current constraint becomes, in deviation variables,
+\begin{equation}
+    -0.707\ \mathrm{A} \leq \Delta i(t) \leq 2.293\ \mathrm{A}.
+\end{equation}
+The upper current margin is large enough for the nominal small-signal tests, but the lower limit is
+important because the current cannot become negative.
+
+The voltage required to keep the ball at the equilibrium point is
+\begin{equation}
+    v_e = R i_e = 6.61\ \mathrm{V}.
+\end{equation}
+Thus the positive voltage headroom before saturation is approximately
+\begin{equation}
+    V_{max} - v_e = 17.39\ \mathrm{V}.
+\end{equation}
+This margin must be considered when choosing fast transients, because high bandwidth controllers
+can demand large current slopes and therefore large coil voltages.
+
+The current saturation is particularly relevant when integral action is used, because actuator saturation
+can produce integrator windup if no protection strategy is included. For this reason, the current loop
+includes voltage saturation and anti-windup, while the position controllers are tested with references
+that keep the current command inside the admissible range.

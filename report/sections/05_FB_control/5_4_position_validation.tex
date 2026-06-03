@@ -14,30 +14,47 @@ The comparison allows us to evaluate the validity of the linear approximation an
 
 The final controller is implemented in Simulink and tested on the physical setup. The experimental response is compared with the simulated one.
 
-\subsubsection{Time validation}
+\subsubsection{Time-Domain Validation}
 
 Report here the measured step response, overshoot, settling time, steady-state error and current effort.
 
-\subsubsection{Frequency validation}
+\subsubsection{Frequency-Domain Validation}
 
 Report here the measured sinusoidal responses and the comparison with the predicted frequency response.
+\begin{table}[H]
+    \centering
+    \caption{Frequency-domain validation summary for the FB controller}
+    \label{tab:fb_frequency_validation}
+    \begin{tabular}{lccc}
+        \toprule
+        Reference & Dominant frequency [Hz] & Attenuation [dB] & Phase shift [deg] \\
+        \midrule
+        FB 1 rad/s  & 0.1526 & -7.575 & 31.23 \\
+        FB 3 rad/s  & 0.4883 & -8.667 & -117.2 \\
+        FB 6 rad/s  & 0.9460 & -6.462 & -53.26 \\
+        FB 20 rad/s & 3.174  & -15.44 & -86.64 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{../img/FB_validation/FB_1_rad.png}
+    \includegraphics[width=0.9\textwidth]{../img/FB_validation/frequency/FB_1_rad.png}
     \caption{Reference  $\omega = 1$ rad/s}
     \label{fig:fb_1_rad}
 \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{../img/FB_validation/FB_3_rad.png}
-    \caption{Reference  $\omega = 3$ rad/s}
-    \label{fig:fb_3_rad}
-\end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{../img/FB_validation/FB_6_rad.png}
+    \includegraphics[width=0.9\textwidth]{../img/FB_validation/frequency/FB_6_rad.png}
     \caption{Reference  $\omega = 6$ rad/s}
     \label{fig:fb_6_rad}
 \end{figure}
+
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=0.9\textwidth]{../img/FB_validation/frequency/FB_20_rad.png}
+%    \caption{Reference  $\omega = 20$ rad/s}
+%    \label{fig:fb_20_rad}
+%\end{figure}
