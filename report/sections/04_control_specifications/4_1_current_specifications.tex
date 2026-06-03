@@ -1,25 +1,13 @@
 \subsection{Current loop specifications}
-
-The closed-loop specifications are defined by considering the physical limits of the setup and the objective of obtaining a
-repeatable and robust levitation.
-The specifications are used as design targets for all controllers, so that the different strategies can be compared on common criteria.
-
 The system is already stable, so we don't have to worry about stabilize it.
 
-\begin{itemize}[leftmargin=1.2cm]
-    \item really fast response
-    \item 
-\end{itemize}
-
-The model has an high accuracy, so we don't need to ask for a very robust behavior.
+The model has an high accuracy, but not for the 
 
 The main constraint is to avoid the voltage saturation, this can introduce a daly in the response action.
 \begin{itemize}
-    \item medium $\phi_m$
-    \item medium $g_m$
-    \item very high badwidth: $\omega_c >> \omega_i$
-    \item limited control action: $ V_{min} < v < V_{max}$ therefore $ \omega_{min} < \omega_c < \omega_{max}$
-    \item 
+    \item good $\phi_m$
+    \item very high bandwidth: $\omega_c >> \omega_i$
+    \item limited control action: $|v_c(t)| \leq V_{max}$ therefore $ \omega_{min} < \omega_c < \omega_{max}$
 \end{itemize}
 
 

@@ -35,9 +35,6 @@ The numerical check gives
 \begin{equation}
     \mathrm{rank}(\mathcal{C}) = 3.
 \end{equation}
-This means that the current reference input $\Delta i_{ref}$ can affect all three states of the extended
-model. In particular, although the input acts directly only on the current state, the current variation
-acts on the acceleration equation and therefore controls the ball position and velocity.
 
 \begin{lstlisting}[style=matlabstyle,caption={Controllability check.}]
 Mr = ctrb(A_ext, B_ext);

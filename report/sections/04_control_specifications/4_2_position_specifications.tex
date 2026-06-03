@@ -4,15 +4,8 @@ The main specifications are:
 \begin{itemize}[leftmargin=1.2cm]
     \item stability around the selected equilibrium point;
     \item limited overshoot in the ball position response;
-    \item settling time compatible with the mechanical dynamics of the plant;
     \item steady-state error close to zero for step references;
-    \item acceptable control effort, without sustained current saturation;
-    \item robust behavior under measurement noise and modelling errors;
-    \item safe implementation on the real setup.
-\end{itemize}
-
-\begin{itemize}
     \item high $\phi_m$
     \item high $g_m$
-    \item limited control action: $ \omega_{min} < \omega_c < \omega_{max}$
+    \item limited control action: $0 \leq i(t) \leq i_{max}$
 \end{itemize}

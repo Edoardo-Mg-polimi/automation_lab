@@ -1,51 +1,5 @@
 \section{Open-loop analysis}
 
-The open-loop analysis is performed on the linearized model around the selected equilibrium point
-$x_e = 7\ \mathrm{mm}$ and $i_e = 0.707\ \mathrm{A}$. The purpose is to characterize the plant before
-designing the position controllers. In particular, the analysis verifies whether the model is unstable,
-controllable and observable, and it identifies the operating limits that must be respected during
-simulation and experimental tests.
-
-The model used in this section is the extended plant introduced in the previous chapter, where the
-mechanical dynamics are combined with the closed current loop:
-\begin{equation}
-    \vect{x}_{ext} =
-    \begin{bmatrix}
-        \Delta x & \Delta \dot{x} & \Delta i
-    \end{bmatrix}^T,
-    \qquad
-    u_{ext} = \Delta i_{ref}.
-\end{equation}
-
-Using $k_1 = 2802.86$, $k_2 = 27.73$ and $\omega_i = 529.42\ \mathrm{rad/s}$, the numerical
-state-space realization is
-\begin{equation}
-    A_{ext} =
-    \begin{bmatrix}
-        0 & 1 & 0 \\
-        2802.86 & 0 & 27.73 \\
-        0 & 0 & -529.42
-    \end{bmatrix},
-    \qquad
-    B_{ext} =
-    \begin{bmatrix}
-        0 \\
-        0 \\
-        529.42
-    \end{bmatrix}.
-\end{equation}
-
-The measured outputs are the ball position variation and the current variation:
-\begin{equation}
-    C_{ext} =
-    \begin{bmatrix}
-        1 & 0 & 0 \\
-        0 & 0 & 1
-    \end{bmatrix},
-    \qquad
-    D_{ext} = 0.
-\end{equation}
-
 \input{sections/03_open_loop_analysis/3_1_stability_analysis}
 \input{sections/03_open_loop_analysis/3_2_controllability}
 \input{sections/03_open_loop_analysis/3_3_observability}

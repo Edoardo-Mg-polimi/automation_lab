@@ -11,32 +11,21 @@ For the extended model, the eigenvalues are
     \left\{
         +52.94,\;
         -52.94,\;
-        -529.42
+        -22.67
     \right\}\ \mathrm{rad/s}.
     \label{eq:open_loop_poles}
 \end{equation}
 
-The pair $\pm 52.94\ \mathrm{rad/s}$ is associated with the mechanical subsystem
-\begin{equation}
-    G_x(s) = \frac{k_2}{s^2-k_1},
-\end{equation}
-whose poles are located at $\pm \sqrt{k_1}$. The positive pole is a direct consequence of the
+
+The positive pole is a direct consequence of the
 open-loop magnetic levitation dynamics: if the ball moves away from the equilibrium point, the
-magnetic force variation does not naturally restore the position. Therefore the equilibrium is unstable
-without feedback.
-
-The third pole, $-529.42\ \mathrm{rad/s}$, is introduced by the closed current loop approximation. This
-pole is stable and significantly faster than the mechanical unstable pole. Hence, the open-loop
-instability of the extended plant is entirely due to the mechanical position dynamics.
-
-Since one eigenvalue has positive real part, the open-loop plant is unstable:
+magnetic force variation does not naturally restore the position.
 \begin{equation}
     \max_i \Re\{\lambda_i\} = 52.94 > 0.
 \end{equation}
-This confirms that a position controller is necessary to keep the ball levitated around the selected
-equilibrium point.
+Therefore the equilibrium is unstable without feedback control.
 
 \begin{lstlisting}[style=matlabstyle,caption={Open-loop pole computation in MATLAB.}]
-poles_ol = eig(A_ext);
+poles_ol = eig(A);
 disp(poles_ol);
 \end{lstlisting}

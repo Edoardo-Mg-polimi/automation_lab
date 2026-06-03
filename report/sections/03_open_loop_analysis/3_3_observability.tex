@@ -15,26 +15,56 @@ The system is observable if
     \mathrm{rank}(\mathcal{O}) = n.
 \end{equation}
 
-For the selected output matrix, position and current are directly measured:
+For the extended model, $n=3$. Since the measured outputs are position and current, the output
+matrix is
 \begin{equation}
-    y =
+    C =
     \begin{bmatrix}
-        \Delta x \\
-        \Delta i
+        1 & 0 & 0 \\
+        0 & 0 & 1
     \end{bmatrix}.
 \end{equation}
-The velocity state is not directly measured, but it appears in the first derivative of the position
-measurement. The observability matrix contains the independent rows
+
+Substituting the structure of $A$ and $C$ gives
+\begin{equation}
+    CA =
+    \begin{bmatrix}
+        0 & 1 & 0 \\
+        0 & 0 & -\omega_i
+    \end{bmatrix},
+\end{equation}
+and
+\begin{equation}
+    CA^2 =
+    \begin{bmatrix}
+        k_1 & 0 & k_2 \\
+        0 & 0 & \omega_i^2
+    \end{bmatrix}.
+\end{equation}
+
+Therefore the observability matrix is
+\begin{equation}
+    \mathcal{O} =
+    \begin{bmatrix}
+        1 & 0 & 0 \\
+        0 & 0 & 1 \\
+        0 & 1 & 0 \\
+        0 & 0 & -\omega_i \\
+        k_1 & 0 & k_2 \\
+        0 & 0 & \omega_i^2
+    \end{bmatrix}.
+\end{equation}
+
+The first, second and third rows already contain three linearly independent directions:
 \begin{equation}
     \begin{bmatrix} 1 & 0 & 0 \end{bmatrix},
     \qquad
     \begin{bmatrix} 0 & 0 & 1 \end{bmatrix},
     \qquad
-    \begin{bmatrix} 0 & 1 & 0 \end{bmatrix},
+    \begin{bmatrix} 0 & 1 & 0 \end{bmatrix}.
 \end{equation}
-which are sufficient to reconstruct the three states.
+Thus the observability matrix has full column rank.
 
-The numerical result is
 \begin{equation}
     \mathrm{rank}(\mathcal{O}) = 3.
 \end{equation}
