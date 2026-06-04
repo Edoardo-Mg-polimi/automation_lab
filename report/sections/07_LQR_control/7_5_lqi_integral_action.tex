@@ -1,10 +1,22 @@
-\subsection{LQI with integral action}
+\subsection{LQR with integral action}
 
-To improve steady-state accuracy, an integrator on the position error is added:
+The final LQ controller used in simulation and on the real setup includes integral action on the
+position error. The simple LQR without integrator is not retained, because reference tracking would
+depend on an additional static scaling and would be more sensitive to modelling errors and steady-state
+offsets. For this reason, the design is performed directly on the augmented model.
+
+The integral state is defined as
 \begin{equation}
     \dot{\xi} = \Delta x_{ref} - \Delta x.
 \end{equation}
-The augmented state is $\vect{x}_{aug} = \begin{bmatrix} \vect{x}_{ext} & \xi \end{bmatrix}^T$, with
+The augmented state is
+\begin{equation}
+    \vect{x}_{aug} =
+    \begin{bmatrix}
+        \Delta x & \Delta \dot{x} & \Delta i & \xi
+    \end{bmatrix}^T.
+\end{equation}
+The augmented matrices are
 \begin{equation}
     A_{aug} =
     \begin{bmatrix}
@@ -18,7 +30,8 @@ The augmented state is $\vect{x}_{aug} = \begin{bmatrix} \vect{x}_{ext} & \xi \e
         0
     \end{bmatrix}.
 \end{equation}
-The LQI weights in \texttt{SS\_model\_LQ.m} are
+
+The weights used for the nominal simulation design in \texttt{SS\_model\_LQ.m} are
 \begin{equation}
     Q_{aug} = \mathrm{diag}(5000, 5\times10^{-1}, 10^{-9}, 9\times10^{4}),
     \qquad
@@ -26,5 +39,21 @@ The LQI weights in \texttt{SS\_model\_LQ.m} are
 \end{equation}
 The resulting gain is
 \begin{equation}
-    K_{aug} = \mathrm{lqr}(A_{aug}, B_{aug}, Q_{aug}, R_{aug}) = \begin{bmatrix} K_{x,lqi} & K_{i,lqi} \end{bmatrix}.
+    K_{aug}
+    =
+    \mathrm{lqr}(A_{aug}, B_{aug}, Q_{aug}, R_{aug})
+    =
+    \begin{bmatrix}
+        K_{x,lqi} & K_{i,lqi}
+    \end{bmatrix}.
+\end{equation}
+The control law is therefore
+\begin{equation}
+    \Delta i_{ref}
+    =
+    -K_{x,lqi}
+    \begin{bmatrix}
+        \Delta x & \Delta \dot{x} & \Delta i
+    \end{bmatrix}^T
+    -K_{i,lqi}\xi.
 \end{equation}

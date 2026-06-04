@@ -94,12 +94,13 @@ Therefore, the transfer function from the amplifier command to the coil current 
     K_g G_i(s) = \frac{K_g}{Ls+R}.
 \end{equation}
 
-A PI controller is selected in order to obtain zero steady-state error for constant current references:
+A PI controller was selected for the inner current loop.
+The plant transfer function of the RL circuit is first order, for which integral action is sufficient to ensure zero steady-state error.
 \begin{equation}
     R_i(s) = K_p + \frac{K_i}{s}
            = K_p\left(1+\frac{1}{T_i s}\right),
 \end{equation}
-\textcolor{red}{WHY PI AND NOT PID?\\}
+
 with
 \begin{equation}
     K_i = \frac{K_p}{T_i}.
@@ -177,6 +178,8 @@ The integral gain is then computed as
 \end{equation}
 
 \subsubsection{Anti Windup}
+\textcolor{red}{da mettere che si può fare in due modi differenti}
+
 In order to protect the coil, a saturation on the voltage actuation is introduced. The coil can accept $\pm V_{\max} = 24\ \mathrm{V}$ as input.
 
 Every time there is an integrator in the control loop and a saturation on the actuator, there is a risk of integrator windup.

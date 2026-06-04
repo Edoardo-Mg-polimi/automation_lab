@@ -1,14 +1,60 @@
 \subsection{Real system implementation and validation}
-
-The LQR and LQI controllers are implemented in Simulink and tested on the physical setup. The experimental response is compared with the simulated one.
+The LQR controller with integral action is implemented in Simulink and tested on the physical setup.
+The experimental tuning is not identical to the simulation tuning. The controller that gives the best
+response in simulation is too aggressive for the real system, while the tuning used on the real setup is
+chosen to account for sensor noise, actuator saturation and model uncertainty. Therefore the simulation
+parameters and the experimental parameters must be interpreted as two different tunings of the same
+control architecture.
 
 \subsubsection{Time-Domain Validation}
 
-Report here the measured step response, overshoot, settling time, steady-state error, and current effort.
+The following sets of weights were tested during the time-domain validation:
+\begin{table}[H]
+\centering
+\caption{LQR with integral action parameters used for time-domain validation.}
+\label{tab:lqri_time_parameters}
+\begin{tabular}{cccccc}
+\toprule
+Test file & $Q_1$ & $Q_2$ & $Q_3$ & $Q_4$ & $R$ \\
+\midrule
+1 & $5000$ & $5$  & $10^{-9}$ & $3\times10^{-4}$ & $0.05$ \\
+2 & $5000$ & $5$  & $10^{-9}$ & $3\times10^{-4}$ & $0.07$ \\
+3 & $5000$ & $5$  & $10^{-9}$ & $3\times10^{-4}$ & $0.09$ \\
+4 & $5000$ & $25$ & $10^{-9}$ & $3\times10^{-4}$ & $0.07$ \\
+5--6 & $5000$ & $25$ & $10^{-9}$ & $5\times10^{-4}$ & $0.07$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textcolor{red}{SOLO I GRAFICI DEL PRIMO}
+
+The table shows the practical retuning process. Increasing the velocity weight and modifying the
+integral-state weight reduced the aggressiveness of the response and made the controller more suitable
+for the experimental setup.
 
 \subsubsection{Frequency-Domain Validation}
 
-Report here the measured sinusoidal responses and the comparison with the predicted frequency response.
+The frequency-domain validation is performed with sinusoidal references at
+\begin{equation}
+    \omega = 1,\ 6,\ 15\ \mathrm{rad/s}.
+\end{equation}
+The experimental tuning used for these tests is
+\begin{equation}
+    Q_{aug,exp}
+    =
+    \mathrm{diag}
+    \left(
+        5000,\;
+        25,\;
+        10^{-9},\;
+        5\times10^{-4}
+    \right),
+    \qquad
+    R_{aug,exp} = 0.09.
+\end{equation}
+The measured sinusoidal response is compared with the predicted frequency response in terms of
+attenuation and phase shift.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{../img/LQRI_validation/LQR_1_rad.png}

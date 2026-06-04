@@ -1,6 +1,6 @@
 
 
-file.mat
+file.mat misurazioni
 
 1 tempo
 2 position reference
@@ -18,3 +18,16 @@ file.mat
 i file:
 1) -75, -80, -5
 2) -80, -85, -2
+
+
+file.mat SIMULAZIONI
+1 tempo
+2 position reference
+3 position simulated
+4 current reference
+5 current simulated
+6 voltage simulated
+7 speed with derivative filtered
+8 speed with observer
+9 errore di posizione
+

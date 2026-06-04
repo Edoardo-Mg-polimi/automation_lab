@@ -1,19 +1,43 @@
 \subsection{Simulation}
-Report here the step responses, overshoot, settling time, and current effort for both LQR and LQI controllers.
-Compare linear and nonlinear results and highlight any saturation effects.
+
+The simulation phase is performed only for the LQR controller with integral action, since this is the
+architecture selected for the real implementation. Both the linear and nonlinear Simulink models are
+used to check the position response, the current request and the possible activation of current
+saturation.
+
+The nominal simulation tuning is
+\begin{equation}
+    Q_{aug,sim}
+    =
+    \mathrm{diag}
+    \left(
+        5000,\;
+        5\times10^{-1},\;
+        10^{-9},\;
+        9\times10^{4}
+    \right),
+    \qquad
+    R_{aug,sim} = 5\times10^{-4}.
+\end{equation}
+
+This set of parameters gives a satisfactory response in simulation, where the model is exact and the
+measurements are ideal. However, the same tuning is not directly suitable for the real plant: measurement
+noise, unmodelled nonlinearities, current saturation and sensor calibration errors require a less
+aggressive experimental tuning. Conversely, the parameters selected for the real setup are not the best
+choice in simulation, because they are intentionally adapted to the limitations of the physical system.
 
 % \begin{figure}[H]
 %     \centering
-%     \includegraphics[width=0.85\textwidth]{lq_step_simulation.pdf}
-%     \caption{Simulation response of the LQR controller.}
-%     \label{fig:lq_step_simulation}
+%     \includegraphics[width=0.85\textwidth]{lqi_step_simulation.pdf}
+%     \caption{Simulation response of the LQR controller with integral action.}
+%     \label{fig:lqi_step_simulation}
 % \end{figure}
 
 \subsubsection{Stability margins}
 
-For the LQI design, the open-loop system used to compute margins is
+For the LQR design with integral action, the open-loop system used to compute margins is
 \begin{equation}
     L_{lqi}(s) = K_{aug}\left(sI - A_{aug}\right)^{-1} B_{aug}.
 \end{equation}
-The gain margin, phase margin, and crossover frequencies are reported here based on the values returned by 
-texttt{margin} in \texttt{SS\_model\_LQ.m}.
+The gain margin, phase margin, and crossover frequencies are reported here based on the values returned
+by \texttt{margin} in \texttt{SS\_model\_LQ.m}.

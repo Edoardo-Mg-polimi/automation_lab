@@ -354,8 +354,8 @@ delta_xi_max     = 0.001;    % [m*s], diminuire pr aumentare l'azione integrale
 % R_aug = 1/delta_iref_max^2;
 
 % Q_aug = diag([5000, 5e-1, 1e-9, 3e4]);
-Q_aug = diag([5000, 5e-1, 1e-9, 9e4]);
-R_aug = 5e-4;
+Q_aug = diag([5000, 25, 1e-9, 5e-4]);
+R_aug = 0.09;
 
 fprintf('\nMatrice Q_aug:\n');
 disp(Q_aug);
