@@ -16,7 +16,7 @@ col_ref = [0 0 1];
 col_meas = [1 0 0];
 
 % FREQUENZE DI TAGLIO PER IL FILTRO PASSA BASSO, IN BASE ALLA FREQUENZA DI INTERESSE
-w = [2, 10, 20]; % [rad/s]
+w = [2, 10, 17]; % [rad/s]
 
 for k = 1:numel(files)
     [t, x_ref, x_meas] = loadFrequencySignal(files{k});
