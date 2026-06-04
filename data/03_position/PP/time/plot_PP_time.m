@@ -44,6 +44,7 @@ for k = 1:numel(matFiles)
     end
 
     plotPosition(t, x_ref, x_meas, simData, baseLabel, col_ref, col_meas, col_sim);
+    plotPositionError(t, x_ref, x_meas, baseLabel, col_ref, col_meas);
     plotCurrent(t, i_ref, i_meas, baseLabel, col_ref, col_meas);
     plotObserverSpeed(t, speed_filt, speed_obs, baseLabel, col_ref, col_meas);
 
@@ -150,6 +151,19 @@ function plotObserverSpeed(t, speed_filt, speed_obs, baseLabel, col_ref, col_mea
     xlabel('Time [s]');
     ylabel('Speed [m/s]');
     title(sprintf('PP observer speed - %s', baseLabel), 'Interpreter', 'none');
+    legend('show', 'Interpreter', 'none', 'Location', 'best');
+end
+
+function plotPositionError(t, x_ref, x_meas, baseLabel, col_ref, col_meas)
+    figure('Color', 'w', 'Name', [baseLabel ' - position error']);
+    hold on; grid on; box on;
+
+    err = x_ref - x_meas;
+    plot(t, err, 'Color', [0 0 0.7], 'LineWidth', 1.4, 'DisplayName', 'Position error');
+
+    xlabel('Time [s]');
+    ylabel('Position error [m]');
+    title(sprintf('PP position error - %s', baseLabel), 'Interpreter', 'none');
     legend('show', 'Interpreter', 'none', 'Location', 'best');
 end
 

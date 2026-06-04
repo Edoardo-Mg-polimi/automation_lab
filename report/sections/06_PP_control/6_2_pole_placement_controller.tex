@@ -311,6 +311,26 @@ The closed loop FDT is:
 \end{equation}
  The eigenvalues of $A_{cl,aug}$ are the assigned poles with PP.
 
+\paragraph{Stability margins}
+The phase and gain margins are computed on the open-loop function associated with the
+state-feedback law, not on the closed-loop transfer function $H_x(s)$. Since MATLAB's
+\texttt{margin} function assumes negative feedback, the loop function is written without
+the minus sign of the control law:
+\begin{equation}
+    L_{PP}(s) =
+    K_{aug}\left(sI-A_{aug}\right)^{-1}B_{aug}.
+\end{equation}
+For the final pole-placement controller with integral action, the resulting margins are:
+\begin{itemize}
+    \item Gain margin: $0.342757$, corresponding to $-9.300263~\mathrm{dB}$ at
+    $\omega_{cg}=10.315955~\mathrm{rad/s}$.
+    \item Phase margin: $67.494406^\circ$ at
+    $\omega_{cp}=139.182456~\mathrm{rad/s}$.
+\end{itemize}
+The gain margin is lower than one because the open-loop augmented plant contains the
+unstable position dynamics. Therefore it represents the critical reduction of the
+nominal feedback gain, rather than an allowable gain increase.
+
  \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{../img/PPI_validation/BODE_Hx_PPI.png}

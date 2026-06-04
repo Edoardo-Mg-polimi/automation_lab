@@ -1,12 +1,13 @@
 \subsection{Real system implementation and validation}
-The LQR controller with integral action is implemented in Simulink and tested on the physical setup.
-The experimental tuning is not identical to the simulation tuning. The controller that gives the best
-response in simulation is too aggressive for the real system, while the tuning used on the real setup is
-chosen to account for sensor noise, actuator saturation and model uncertainty. Therefore the simulation
-parameters and the experimental parameters must be interpreted as two different tunings of the same
-control architecture.
+Different tunings of $Q_{aug}$ and $R_{aug}$ were evaluated both in simulation and on the real apparatus.
+However, the tuning configurations providing satisfactory simulated performance did not always achieve comparable results
+on the physical system, and vice versa.
+This discrepancy is likely due to model mismatch, significant parameter uncertainties,
+unmodelled nonlinearities and time-varying operating conditions affecting the real magnetic levitation system.
 
 \subsubsection{Time-Domain Validation}
+The time-domain logs in \texttt{data/03\_position/LQR/time} contain reference and measured position,
+Kalman-filter speed, reference and measured current, and position error.
 
 The following sets of weights were tested during the time-domain validation:
 \begin{table}[H]
@@ -26,45 +27,61 @@ Test file & $Q_1$ & $Q_2$ & $Q_3$ & $Q_4$ & $R$ \\
 \end{tabular}
 \end{table}
 
-\textcolor{red}{SOLO I GRAFICI DEL PRIMO}
+The table summarizes the practical retuning process. Increasing the velocity weight and adapting the
+integral-state weight reduced oscillations on the real setup.
 
-The table shows the practical retuning process. Increasing the velocity weight and modifying the
-integral-state weight reduced the aggressiveness of the response and made the controller more suitable
-for the experimental setup.
+The representative log shows tracking around $7~\mathrm{mm}$, with visible measurement noise and some
+spikes. This confirms the need for the Kalman speed estimate.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{../img/LQRI_validation/time/LQ_TimeValid_PositionTracking.png}
+    \caption{LQI time-domain position tracking on the real setup.}
+    \label{fig:lqri_time_position}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{../img/LQRI_validation/time/LQ_TimeValid_PositionError.png}
+    \caption{Position error during LQI time-domain validation.}
+    \label{fig:lqri_time_error}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{../img/LQRI_validation/time/LQ_TimeValid_CurrentTracking.png}
+    \caption{Current tracking during LQI time-domain validation.}
+    \label{fig:lqri_time_current}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{../img/LQRI_validation/time/LQ_TimeValid_SpeedEstimation.png}
+    \caption{Kalman-filter velocity estimate compared with the derivative-based speed signal.}
+    \label{fig:lqri_time_speed}
+\end{figure}
+
+
 
 \subsubsection{Frequency-Domain Validation}
-
 The frequency-domain validation is performed with sinusoidal references at
 \begin{equation}
     \omega = 1,\ 6,\ 15\ \mathrm{rad/s}.
 \end{equation}
-The experimental tuning used for these tests is
-\begin{equation}
-    Q_{aug,exp}
-    =
-    \mathrm{diag}
-    \left(
-        5000,\;
-        25,\;
-        10^{-9},\;
-        5\times10^{-4}
-    \right),
-    \qquad
-    R_{aug,exp} = 0.09.
-\end{equation}
+
 The measured sinusoidal response is compared with the predicted frequency response in terms of
 attenuation and phase shift.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{../img/LQRI_validation/LQR_1_rad.png}
+    \includegraphics[width=0.9\textwidth]{../img/LQRI_validation/frequency/LQR_1_rad.png}
     \caption{Reference  $\omega = 1$ rad/s}
     \label{fig:lqr_1_rad}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{../img/LQRI_validation/LQR_6_rad.png}
+    \includegraphics[width=0.9\textwidth]{../img/LQRI_validation/frequency/LQR_6_rad.png}
     \caption{Reference  $\omega = 6$ rad/s}
     \label{fig:lqr_6_rad}
 \end{figure}

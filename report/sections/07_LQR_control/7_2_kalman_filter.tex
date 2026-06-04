@@ -1,23 +1,81 @@
 \subsection{State estimation with Kalman filter}
 
-State estimation uses a continuous-time Kalman filter (LQE) on the mechanical model. The measured output is the position, with
+As before, since only the ball position and the coil current are measured, 
+the velocity required by the state-feedback controller is estimated through a continuous-time Kalman filter.
+
+The estimator is designed on the linearized mechanical model
 \begin{equation}
-    C_{meas} = \begin{bmatrix} 1 & 0 \end{bmatrix}.
+    \dot{\vect{x}}_{kf}
+    =
+    A_x \vect{x}_{kf}
+    +
+    B_x \Delta i
+    \qquad
+    y = C_{meas}\vect{x}_{kf} + v
 \end{equation}
-Process noise is applied on the acceleration channel,
+where
 \begin{equation}
-    G_{kf} = \begin{bmatrix} 0 \\ 1 \end{bmatrix},
-\end{equation}
-and the tuning values in \texttt{SS\_model\_LQ.m} are
-\begin{equation}
-    \sigma_a = 20, \qquad \sigma_{yx} = 0.1\times10^{-3}.
+    \vect{x}_{kf}
+    =
+    \begin{bmatrix}
+        \Delta x & \Delta \dot{x}
+    \end{bmatrix}^{T}
+    \qquad
+    C_{meas}
+    =
+    \begin{bmatrix}
+        1 & 0
+    \end{bmatrix}
 \end{equation}
 
-The covariance matrices are
+
+Tuning parameters:
 \begin{equation}
-    Q_{kf} = \sigma_a^2, \qquad R_{kf} = \sigma_{yx}^2,
+    Q_{kf} = \sigma_a^2,
+    \qquad
+    R_{kf} = \sigma_{yx}^2
+    \qquad
+    \sigma_a = 20~\mathrm{m/s^2}
+    \qquad
+    \sigma_{yx} = 0.1 \times 10^{-3}~\mathrm{m}
 \end{equation}
-and the Kalman gain is
+
+The covariance $Q_{kf}$ accounts for uncertainty in the mechanical model,
+represented as an equivalent acceleration disturbance, whereas $R_{kf}$ describes the noise affecting the measured ball position.
+Their tuning determines the trade-off between estimation speed and noise attenuation: increasing $Q_{kf}$ or decreasing $R_{kf}$
+makes the estimator more responsive, but may lead to a noisier velocity estimate.
+
+
+
+The continuous-time Kalman gain is computed in MATLAB as
 \begin{equation}
-    L_{kf} = \mathrm{lqe}(A_x, G_{kf}, C_{meas}, Q_{kf}, R_{kf}).
+    L_{kf}
+    =
+    \mathrm{lqe}(A_x,G_{kf},C_{meas},Q_{kf},R_{kf}),
 \end{equation}
+leading to the estimator dynamics
+\begin{equation}
+    \dot{\hat{\vect{x}}}_{kf}
+    =
+    \left(A_x - L_{kf}C_{meas}\right)\hat{\vect{x}}_{kf}
+    +
+    B_x \Delta i
+    +
+    L_{kf}\Delta x_{meas}.
+\end{equation}
+
+The resulting gain and estimator poles are
+\begin{equation}
+    L_{kf}
+    = 10^{5} \cdot
+    \begin{bmatrix}
+        0.0064  \\
+        2.0282 
+    \end{bmatrix},
+    \qquad
+    p_{kf}
+    =
+    -318.45 \pm j\,314.02.
+\end{equation}
+
+

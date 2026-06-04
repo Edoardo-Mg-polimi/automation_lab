@@ -1,43 +1,92 @@
 \subsection{LQR with integral action}
 
-The final LQ controller used in simulation and on the real setup includes integral action on the
-position error. The simple LQR without integrator is not retained, because reference tracking would
-depend on an additional static scaling and would be more sensitive to modelling errors and steady-state
-offsets. For this reason, the design is performed directly on the augmented model.
+The controller is designed directly on the augmented model with integral action. All variables are
+deviations from the equilibrium point, and the input is $\Delta i_{ref}$.
 
 The integral state is defined as
 \begin{equation}
-    \dot{\xi} = \Delta x_{ref} - \Delta x.
+    \dot{x_i} = x_{ref} - x.
 \end{equation}
 The augmented state is
 \begin{equation}
     \vect{x}_{aug} =
     \begin{bmatrix}
-        \Delta x & \Delta \dot{x} & \Delta i & \xi
+         x &  \dot{x} & i & x_i
     \end{bmatrix}^T.
 \end{equation}
 The augmented matrices are
 \begin{equation}
     A_{aug} =
     \begin{bmatrix}
-        A_{ext} & 0 \\
+        A & 0 \\
         -C_{pos} & 0
     \end{bmatrix},
     \qquad
     B_{aug} =
     \begin{bmatrix}
-        B_{ext} \\
+        B \\
         0
     \end{bmatrix}.
 \end{equation}
 
-The weights used for the nominal simulation design in \texttt{SS\_model\_LQ.m} are
+With 
 \begin{equation}
-    Q_{aug} = \mathrm{diag}(5000, 5\times10^{-1}, 10^{-9}, 9\times10^{4}),
-    \qquad
-    R_{aug} = 5\times10^{-4}.
+    C_{\mathrm{pos}}
+    =
+    \begin{bmatrix}
+        1 & 0 & 0
+    \end{bmatrix}.
 \end{equation}
-The resulting gain is
+
+
+The quadratic cost minimized by the controller is
+\begin{equation}
+    J
+    =
+    \int_0^{\infty}
+    \left(
+        \vect{x}_{aug}^T Q_{aug}\vect{x}_{aug}
+        +
+        \Delta i_{ref}^T R_{aug}\Delta i_{ref}
+    \right)
+    \dd t,
+\end{equation}
+with
+\begin{equation}
+    Q_{aug}
+    =
+    \mathrm{diag}
+    \left(
+        q_x,\;
+        q_{\dot{x}},\;
+        q_i,\;
+        q_{x_i}
+    \right)
+    \qquad
+    R_{aug}=r
+\end{equation}
+The terms of $Q_{aug}$ penalize position, velocity, current variation and accumulated position error.
+$R_{aug}$ penalizes the requested current variation.
+
+The final best experimental tuning is
+\begin{equation}
+    Q_{aug,exp}
+    =
+    \mathrm{diag}
+    \left(
+        5000,\;
+        5,\;
+        10^{-9},\;
+        3\times10^{-4}
+    \right),
+    \qquad
+    R_{aug,exp}=0.05.
+\end{equation}
+The simulation parameters work with the ideal model but are too aggressive on the real setup. The
+experimental parameters account for noise, nonlinearities and current saturation, but are not optimal in
+nominal simulation.
+
+For a chosen pair $(Q_{aug},R_{aug})$, the feedback gain is
 \begin{equation}
     K_{aug}
     =
@@ -53,7 +102,7 @@ The control law is therefore
     =
     -K_{x,lqi}
     \begin{bmatrix}
-        \Delta x & \Delta \dot{x} & \Delta i
+         x &  \dot{x} &  i
     \end{bmatrix}^T
-    -K_{i,lqi}\xi.
+    -K_{i,lqi}x_i.
 \end{equation}

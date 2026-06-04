@@ -302,6 +302,27 @@ disp(eig(A_cl_aug));
 
 H_x = ss(A_cl_aug, Br_aug, C_aug, 0);
 
+% 5.5) Stability margins
+%
+% The margins are computed on the open-loop transfer function associated
+% with the state feedback, not on the closed-loop reference-to-position
+% transfer function H_x(s).
+%
+% With u = -K_aug*x_aug, the loop function used by margin() is:
+% L_pp(s) = K_aug * (sI - A_aug)^(-1) * B_aug.
+L_pp = ss(A_aug, B_aug, K_aug, 0);
+L_pp = minreal(L_pp);
+
+[GM_pp, PM_pp, Wcg_pp, Wcp_pp] = margin(L_pp);
+GMdB_pp = 20*log10(GM_pp);
+
+fprintf('\nMargini di stabilità PP con azione integrale:\n');
+fprintf('Gain margin: %.6f\n', GM_pp);
+fprintf('Gain margin [dB]: %.6f dB\n', GMdB_pp);
+fprintf('Phase margin: %.6f deg\n', PM_pp);
+fprintf('Frequenza phase crossover Wcg: %.6f rad/s\n', Wcg_pp);
+fprintf('Frequenza gain crossover Wcp: %.6f rad/s\n', Wcp_pp);
+
 figure
 bode(H_x)
 grid on
