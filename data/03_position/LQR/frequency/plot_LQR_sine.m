@@ -12,6 +12,9 @@ labels = {
     'LQR 6 rad/s'
     'LQR 15 rad/s'
 };
+col_ref = [0 0 1];
+col_meas = [1 0 0];
+
 % FREQUENZE DI TAGLIO PER IL FILTRO PASSA BASSO, IN BASE ALLA FREQUENZA DI INTERESSE
 w = [2, 10, 20]; % [rad/s]
 
@@ -25,8 +28,8 @@ for k = 1:numel(files)
     hold on;
     grid on;
 
-    plot(t, x_ref, 'LineWidth', 1.4);
-    plot(t, x_meas_filt, 'LineWidth', 1.4);
+    plot(t, x_ref, 'Color', col_ref, 'LineWidth', 1.4);
+    plot(t, x_meas_filt, 'Color', col_meas, 'LineWidth', 1.4);
 
     xlabel('Time [s]');
     ylabel('Position [m]');

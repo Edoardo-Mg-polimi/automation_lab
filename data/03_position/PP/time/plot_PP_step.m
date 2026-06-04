@@ -19,6 +19,8 @@ labels = {
 figure;
 hold on; grid on;
 
+col_meas = [1 0 0];
+
 for k = 1:length(files)
 
     % Carica il file .mat
@@ -38,7 +40,7 @@ for k = 1:length(files)
     x_meas = data(3,:);
 
     % Plot measured position
-    plot(t, x_meas, 'LineWidth', 1.3);
+    plot(t, x_meas, 'Color', col_meas, 'LineWidth', 1.3);
 
     metrics = compute_system_metrics(t, x_meas, data(2, :), []);
     print_system_metrics(labels{k}, metrics);

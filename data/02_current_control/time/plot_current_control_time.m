@@ -27,10 +27,10 @@ for k = 1:length(files)
 
     t = data(1, :);
     i_meas = data(3, :);
-    % colors: reference = blue, measured = orange, voltage = green
-    col_ref = [0 0.4470 0.7410];
-    col_meas = [0.8500 0.3250 0.0980];
-    col_vol = [0.4660 0.6740 0.1880];
+    % colors: reference = blue, measured = red
+    col_ref = [0 0 1];
+    col_meas = [1 0 0];
+    col_vol = col_meas;
 
     refPlotted = false;
     % plot currents on currents figure

@@ -16,9 +16,9 @@ figure(figI); hold on; grid on;
 figV = figure;
 figure(figV); hold on; grid on;
 
-col_ref = [0 0.4470 0.7410];
-col_meas = [0.8500 0.3250 0.0980];
-col_vol = [0.4660 0.6740 0.1880];
+col_ref = [0 0 1];
+col_meas = [1 0 0];
+col_vol = col_meas;
 
 for k = 1:length(matFiles)
     filePath = fullfile(scriptDir, matFiles(k).name);

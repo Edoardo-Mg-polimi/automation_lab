@@ -40,7 +40,7 @@ function plotCalibrationMatrix(t, signals, plotName)
 
     for idx = 1:nSignals
         subplot(nSignals, 1, idx);
-        plot(t, signals(idx, :), 'LineWidth', 1.3);
+        plot(t, signals(idx, :), 'Color', signalColor(idx), 'LineWidth', 1.3);
         grid on;
         ylabel(sprintf('Signal %d', idx));
 
@@ -51,5 +51,20 @@ function plotCalibrationMatrix(t, signals, plotName)
         if idx == nSignals
             xlabel('Time [s]');
         end
+    end
+end
+
+function col = signalColor(idx)
+    semanticColors = {
+        [0 0 1]  % reference
+        [1 0 0]  % measured
+        [0 0.6 0]  % simulation
+    };
+
+    if idx <= numel(semanticColors)
+        col = semanticColors{idx};
+    else
+        fallbackColors = lines(idx);
+        col = fallbackColors(idx, :);
     end
 end

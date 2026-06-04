@@ -10,8 +10,8 @@ end
 [~, order] = sort({matFiles.name});
 matFiles = matFiles(order);
 
-col_ref = [0 0.4470 0.7410];
-col_meas = [0.8500 0.3250 0.0980];
+col_ref = [0 0 1];
+col_meas = [1 0 0];
 
 for k = 1:numel(matFiles)
     filePath = fullfile(scriptDir, matFiles(k).name);

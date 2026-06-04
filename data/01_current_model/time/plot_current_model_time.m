@@ -24,40 +24,36 @@ figure(figI); hold on; grid on;
 figV = figure;
 figure(figV); hold on; grid on;
 
-col_current = [0 0.4470 0.7410];
-col_voltage = [0.8500 0.3250 0.0980];
+col_meas = [1 0 0];
+col_sim = [0 0.6 0];
+col_voltage = [1 0 0];
 
 for k = 1:length(matFiles)
     filePath = fullfile(scriptDir, matFiles(k).name);
     S = load(filePath);
-    varName = fieldnames(S);
-    data = S.(varName{1});
+    baseLabel = erase(matFiles(k).name, '.mat');
+    [t, current, voltage] = extract_current_model_data(S);
+    traceColor = col_meas;
 
-    if size(data, 1) > size(data, 2) && size(data, 2) <= 32
-        data = data.';
+    if is_simulation_label(baseLabel)
+        traceColor = col_sim;
     end
 
-    t = data(1, :);
-    baseLabel = erase(matFiles(k).name, '.mat');
-
     figure(figI);
-    if size(data, 1) >= 3
-        plot(t, data(3, :), 'Color', col_current, 'LineWidth', 1.3, ...
+    if ~isempty(current)
+        plot(t, current, 'Color', traceColor, 'LineWidth', 1.3, ...
             'DisplayName', [baseLabel ' current']);
     end
 
-    if size(data, 1) >= 4
+    if ~isempty(voltage)
         figure(figV);
-        plot(t, data(4, :), 'Color', col_voltage, 'LineWidth', 1.3, ...
+        plot(t, voltage, 'Color', col_voltage, 'LineWidth', 1.3, ...
             'DisplayName', [baseLabel ' voltage']);
     end
 
-    inputSignal = [];
-    if size(data, 1) >= 4
-        inputSignal = data(4, :);
-    end
+    inputSignal = voltage;
 
-    metrics = compute_system_metrics(t, data(3, :), inputSignal, G_i);
+    metrics = compute_system_metrics(t, current, inputSignal, G_i);
     print_system_metrics(baseLabel, metrics);
 end
 
@@ -72,6 +68,70 @@ xlabel('Time [s]');
 ylabel('Voltage [V]');
 title('Voltage vs Time - current model');
 legend('show', 'Interpreter', 'none', 'Location', 'best');
+
+function [t, current, voltage] = extract_current_model_data(S)
+    names = fieldnames(S);
+    raw = S.(names{1});
+    voltage = [];
+
+    if isa(raw, 'timeseries')
+        t = raw.Time;
+        current = vector_from_timeseries_data(raw.Data, numel(t));
+        return;
+    end
+
+    if isstruct(raw) && isfield(raw, 'Time') && isfield(raw, 'Data')
+        t = raw.Time;
+        current = vector_from_timeseries_data(raw.Data, numel(t));
+        return;
+    end
+
+    if ~isnumeric(raw)
+        error('Unsupported data format in MAT file.');
+    end
+
+    data = raw;
+
+    if size(data, 1) > size(data, 2) && size(data, 2) <= 32
+        data = data.';
+    end
+
+    if size(data, 1) < 3
+        error('Numeric data must contain at least time and current rows.');
+    end
+
+    t = data(1, :);
+    current = data(3, :);
+
+    if size(data, 1) >= 4
+        voltage = data(4, :);
+    end
+end
+
+function y = vector_from_timeseries_data(data, nTime)
+    y = squeeze(data);
+
+    if isvector(y)
+        y = y(:).';
+        return;
+    end
+
+    if size(y, 1) == nTime
+        y = y(:, 1).';
+    elseif size(y, 2) == nTime
+        y = y(1, :);
+    else
+        y = y(:).';
+        if numel(y) < nTime
+            error('Timeseries data has fewer samples than its time vector.');
+        end
+        y = y(1:nTime);
+    end
+end
+
+function isSim = is_simulation_label(label)
+    isSim = ~isempty(strfind(lower(label), 'simulation'));
+end
 
 function metrics = compute_system_metrics(t, y, inputSignal, modelTF)
     t = t(:).';

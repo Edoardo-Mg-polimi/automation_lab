@@ -10,12 +10,15 @@ lowPassCutoffHz = w/(2*pi); % [Hz] REGOLA IL FILTRO
 [x_meas_filt, filtInfo] = lowpassNumeric(t, x_meas, lowPassCutoffHz);
 metrics = computeFrequencyMetrics(t, x_ref, x_meas_filt);
 
+col_ref = [0 0 1];
+col_meas = [1 0 0];
+
 figure('Color', 'w');
 hold on;
 grid on;
 
-plot(t, x_ref, 'LineWidth', 1.4);
-plot(t, x_meas_filt, 'LineWidth', 1.4);
+plot(t, x_ref, 'Color', col_ref, 'LineWidth', 1.4);
+plot(t, x_meas_filt, 'Color', col_meas, 'LineWidth', 1.4);
 
 xlabel('Time [s]');
 ylabel('Measured position [m]');

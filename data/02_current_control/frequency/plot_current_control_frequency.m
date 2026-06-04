@@ -56,9 +56,9 @@ function plotValidationSeries(t, signals, labels, plotTitle)
         error('Expected at least two signals to plot in %s.', plotTitle);
     end
 
-    plot(t, signals(1, :), 'LineWidth', 1.3, 'Color', [0 0.4470 0.7410]);
+    plot(t, signals(1, :), 'LineWidth', 1.3, 'Color', [0 0 1]);
     hold on;
-    plot(t, signals(2, :), 'LineWidth', 1.3, 'Color', [0.8500 0.3250 0.0980]);
+    plot(t, signals(2, :), 'LineWidth', 1.3, 'Color', [1 0 0]);
     grid on;
     title(plotTitle);
     xlabel('Time [s]');

@@ -15,6 +15,9 @@ labels = {
     'FB 20 rad/s'
 };
 
+col_ref = [0 0 1];
+col_meas = [1 0 0];
+
 w = [2, 6, 12, 25]; % [rad/s]
 
 for k = 1:numel(files)
@@ -27,8 +30,8 @@ for k = 1:numel(files)
     hold on;
     grid on;
 
-    plot(t, x_ref, 'LineWidth', 1.4);
-    plot(t, x_meas_filt, 'LineWidth', 1.4);
+    plot(t, x_ref, 'Color', col_ref, 'LineWidth', 1.4);
+    plot(t, x_meas_filt, 'Color', col_meas, 'LineWidth', 1.4);
 
     xlabel('Time [s]');
     ylabel('Position [m]');

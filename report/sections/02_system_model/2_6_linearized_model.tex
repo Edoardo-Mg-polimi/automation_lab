@@ -117,7 +117,7 @@ In the implemented controllers, it is important to distinguish absolute variable
 \end{equation*}
 
 \subsubsection{Linearization}
-The coplete model is
+The coplete model considering $v_c = K_g u$
 \[
 \begin{cases}
     \dot{x}_1 = x_2 \\[2mm]
@@ -220,9 +220,9 @@ A_{23}\,\delta x_3.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Defining
 \[
-    k_1 = \frac{2 K_m i_e^2}{m (l - 2 r - x_e)^3} \simeq 2802.857
+    k_1 = A_{21} = \frac{2 K_m i_e^2}{m (l - 2 r - x_e)^3} \simeq 2802.857
     \qquad
-    k_2 = \frac{2 K_m i_e}{m (l - 2 r - x_e)^2} \simeq 27.732
+    k_2 = A_{23} = \frac{2 K_m i_e}{m (l - 2 r - x_e)^2} \simeq 27.732
 \]
 
 The complete model is:
@@ -242,7 +242,7 @@ with
     \begin{bmatrix}
         0 \\
         0 \\
-        \omega_i
+        \frac{K_g}{L}
     \end{bmatrix}.
 \end{equation}
 

@@ -68,10 +68,15 @@ function plotMainSimulation(data, plotName, controllerName)
     hold on;
     grid on;
 
-    plot(t, signals(1, :), 'LineWidth', 1.4, 'DisplayName', 'Position reference');
+    col_ref = [0 0 1];
+    col_sim = [0 0.6 0];
+
+    plot(t, signals(1, :), 'Color', col_ref, 'LineWidth', 1.4, ...
+        'DisplayName', 'Position reference');
 
     if size(signals, 1) >= 2
-        plot(t, signals(2, :), 'LineWidth', 1.4, 'DisplayName', 'Position response');
+        plot(t, signals(2, :), 'Color', col_sim, 'LineWidth', 1.4, ...
+            'DisplayName', 'Position response');
     end
 
     xlabel('Time [s]');
@@ -90,7 +95,7 @@ function plotAllSignals(data, plotName, controllerName)
 
     for idx = 1:nSignals
         nexttile;
-        plot(t, signals(idx, :), 'LineWidth', 1.2);
+        plot(t, signals(idx, :), 'Color', simulationSignalColor(idx), 'LineWidth', 1.2);
         grid on;
         ylabel(signalLabel(idx));
 
@@ -101,6 +106,20 @@ function plotAllSignals(data, plotName, controllerName)
         if idx == nSignals
             xlabel('Time [s]');
         end
+    end
+end
+
+function col = simulationSignalColor(idx)
+    col_ref = [0 0 1];
+    col_sim = [0 0.6 0];
+    col_default = [0 0 0];
+
+    if any(idx == [1 7 9])
+        col = col_ref;
+    elseif idx == 10
+        col = col_default;
+    else
+        col = col_sim;
     end
 end
 
