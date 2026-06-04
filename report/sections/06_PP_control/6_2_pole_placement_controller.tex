@@ -188,7 +188,7 @@
     % xdot_hat sent to the MUX
     % =========================================================
 
-    % estimated postion
+    % estimated position
     \draw[line] ($(obs.west)+(0,0.22)$) -- ++(-0.65,0)
         node[left] {$\hat{x}$};
 
@@ -221,11 +221,11 @@
 \paragraph{Requirements}
 The pole $-\omega_i$ is included in the state-space model, in order to consider the inner current loop dynamics $H_i$,
 instead of considering the current as instantaneous.
-During pole placement the electrical pole is kept in the desired pole set, because this dynamics is already much faster than
-the mechanical response and is fixed by the current controller.
+During pole placement the electrical pole is kept in the desired pole set because it is already much
+faster than the mechanical response and is fixed by the current controller.
 
 The simple pole-placement controller with reference scaling was not retained as final solution,
-because it does not guarantee robust zero steady-state error on the real plant. The implemented
+because it does not guarantee robust zero steady-state error on the real plant. The final
 controller is therefore the pole placement with integral action, which adds an integral state on the
 position error:
 \begin{equation}
@@ -259,7 +259,7 @@ The controllability of the augmented pair $(A_{aug},B_{aug})$ is checked in
         K_x & K_i
     \end{bmatrix}.
 \end{equation}
-With $K_i$ the gain of the integral action and $K_x$ the state feedback gain.
+Here $K_i$ is the integral-action gain and $K_x$ is the state-feedback gain.
 
 
 The implemented control law is
@@ -283,10 +283,11 @@ In \texttt{SS\_model\_PP.m} the integral pole is chosen as $p_{int} = -3$ and th
 \end{equation}
 The poles $-70$ and $-75$ set the dominant mechanical closed-loop dynamics. The integral pole is placed
 at $-3$. Different integral-pole choices were tested during validation, but the final
-choice with $p_{int}=-3$ gave a better compromise.
-Lower values of $p_{int}$ are too near the imaginary axis, and values higher than $-5$ introduce oscillations in the response.
+choice with $p_{int}=-3$ gave the best compromise.
+Lower values of $p_{int}$ are too close to the imaginary axis, whereas values higher than $-5$
+introduce oscillations in the response.
 
-\paragraph{Closed loop system}
+\paragraph{Closed-loop system}
 Here $C_{aug} = \begin{bmatrix}1 & 0 & 0 & 0\end{bmatrix}$ selects the position state from
 $\vect{x}_{aug}$. After applying the feedback gain, the augmented closed-loop matrix is
 \begin{equation}
@@ -304,12 +305,12 @@ The reference enters only through the integrator state, therefore
 \end{equation}
 
 
-The closed loop FDT is:
+The closed-loop transfer function is
 \begin{equation}
     H_x(s) =
     C_{aug}\left(sI-A_{cl,aug}\right)^{-1}B_{r,aug},
 \end{equation}
- The eigenvalues of $A_{cl,aug}$ are the assigned poles with PP.
+The eigenvalues of $A_{cl,aug}$ are the assigned pole-placement poles.
 
 \paragraph{Stability margins}
 The stability margins were evaluated on the open-loop transfer function associated with the

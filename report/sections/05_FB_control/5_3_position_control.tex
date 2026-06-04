@@ -1,41 +1,38 @@
 \subsection{Position control}
 
-The Frequency-Based Position Control was divided into two parts. 
-
-
-The first part consisted in a regulator able to stabilize the unstable dynamic introduced with the linearized mechanical model.
-The parameters for this regulator were identified using the Nyquist criterion and the Root Locus of the open-loop transfer function of the system.
-MATLAB’s tool \textit{sisoTool} was utilized for this purpose. A set of two complex conjugate poles and complex conjugate zeros were chosen in order to easily stabilize the system while maintaining acceptable margins.
-The Nyquist diagram of the stabilized system’s open-loop transfer function is:
+The frequency-based position controller was designed in two stages.
+First, a stabilizing regulator was introduced for the unstable dynamics of the linearized
+mechanical model. Its parameters were selected using the Nyquist criterion and the root locus of the
+open-loop transfer function. MATLAB's \textit{sisoTool} was used to tune two complex-conjugate poles
+and two complex-conjugate zeros while maintaining acceptable margins.
+The Nyquist diagram of the stabilized system open-loop transfer function is:
 % Diagramma di nyquist 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{../img/FB_validation/NYQUIST_FB_stabilizED.png}
-    \caption{Nyquist diagram of the stabilized open-loop transfer function}
+    \caption{Nyquist diagram of the stabilized open-loop transfer function.}
     \label{fig:nyquist_fb_stabilized}
 \end{figure}
 
-The second part of the control was a I regulator able to guarantee zero steady state error and reference tracking.
-MATLAB’s tool \textit{pidTuner} was utilized for this purpose.
-This new control loop was applied around the stabilizing control loop described in the previous section.
-The control architecture based on which the two controllers were designed is
+Second, an integral regulator was added to guarantee zero steady-state error for constant references.
+MATLAB's \textit{pidTuner} was used for this outer loop. The resulting control architecture is shown in
+\figref{fig:control_scheme_linearized}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{../img/FB_validation/Control_Scheme_Linearized_Model.png}
-    \caption{Control scheme of the linearized model}
+    \caption{Control scheme of the linearized model.}
     \label{fig:control_scheme_linearized}
 \end{figure}
 
 
 
 
-After a first draft of parameters, based on the linearized model of the system \figref{fig:control_scheme_linearized},
-multiple adjustments were applied based on the non-linear model of the system \figref{fig:control_scheme_nonlinear}
-response and tests on the real hardware.
+After the initial linear design, the parameters were refined using the nonlinear model in
+\figref{fig:control_scheme_nonlinear} and experimental tests on the real hardware.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{../img/FB_validation/Control_Scheme_Nonlinear_Model.png}
-    \caption{Control scheme of the nonlinear model}
+    \caption{Control scheme of the nonlinear model.}
     \label{fig:control_scheme_nonlinear}
 \end{figure}
 
@@ -52,7 +49,7 @@ The stabilizing controller and the integral controller are
 The margins obtained by the full system open-loop transfer function are:
 \begin{itemize}
     \item Gain margin: 56.102481
-    \item Phase margin: 88.431152~deg
+    \item Phase margin: $88.431152^\circ$
     \item Bandwidth: 5~rad/s
 \end{itemize}
 
@@ -64,4 +61,3 @@ The margins obtained by the full system open-loop transfer function are:
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-

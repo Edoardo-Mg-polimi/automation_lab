@@ -1,7 +1,8 @@
 \subsection{State estimation with Kalman filter}
 
-As before, since only the ball position and the coil current are measured, 
-the velocity required by the state-feedback controller is estimated through a continuous-time Kalman filter.
+As in the pole-placement controller, only the ball position and the coil current are measured.
+The velocity required by the state-feedback law is therefore estimated with a continuous-time Kalman
+filter.
 
 The estimator is designed on the linearized mechanical model
 \begin{equation}
@@ -29,7 +30,7 @@ where
 \end{equation}
 
 
-Tuning parameters:
+The tuning parameters are
 \begin{equation}
     Q_{kf} = \sigma_a^2,
     \qquad
@@ -40,12 +41,9 @@ Tuning parameters:
     \sigma_{yx} = 0.1 \times 10^{-3}~\mathrm{m}
 \end{equation}
 
-The covariance $Q_{kf}$ accounts for uncertainty in the mechanical model,
-represented as an equivalent acceleration disturbance, whereas $R_{kf}$ describes the noise affecting the measured ball position.
-Their tuning determines the trade-off between estimation speed and noise attenuation: increasing $Q_{kf}$ or decreasing $R_{kf}$
-makes the estimator more responsive, but may lead to a noisier velocity estimate.
-
-
+The covariance $Q_{kf}$ accounts for mechanical model uncertainty, represented as an equivalent
+acceleration disturbance, while $R_{kf}$ describes the position-sensor noise. Their tuning sets the
+trade-off between estimation speed and noise attenuation.
 
 The continuous-time Kalman gain is computed in MATLAB as
 \begin{equation}
@@ -77,5 +75,4 @@ The resulting gain and estimator poles are
     =
     -318.45 \pm j\,314.02.
 \end{equation}
-
 

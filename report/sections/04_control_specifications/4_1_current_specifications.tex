@@ -1,13 +1,9 @@
 \subsection{Current loop specifications}
-The system is already stable, so we don't have to worry about stabilize it.
-
-The model has an high accuracy, but not for the 
-
-The main constraint is to avoid the voltage saturation, this can introduce a daly in the response action.
+The electrical subsystem is open-loop stable, so the current controller is mainly required to provide
+fast tracking of the current reference while avoiding actuator saturation.
 \begin{itemize}
-    \item good $\phi_m$
-    \item very high bandwidth: $\omega_c >> \omega_i$
-    \item limited control action: $|v_c(t)| \leq V_{max}$ therefore $ \omega_{min} < \omega_c < \omega_{max}$
+    \item adequate phase margin $\phi_m$;
+    \item high bandwidth with respect to the electrical pole, $\omega_c \gg \omega_i$;
+    \item limited control action, $|v_c(t)| \leq V_{max}$.
 \end{itemize}
-
 

@@ -4,31 +4,36 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.9\textwidth]{../img/PPI_validation/ramp.png}
-	\caption{Time-domain validation with ramp reference.}
-	\label{fig:ppi_time_ramp}
-\end{figure}
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../img/PPI_validation/ramp.png}
+		\caption{Position tracking.}
+		\label{fig:ppi_time_ramp}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../img/PPI_validation/current.png}
+		\caption{Measured current.}
+		\label{fig:ppi_time_current}
+	\end{subfigure}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.9\textwidth]{../img/PPI_validation/current.png}
-	\caption{Measured current during ramp validation.}
-	\label{fig:ppi_time_current}
+	\vspace{0.5em}
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../img/PPI_validation/speed.png}
+		\caption{Measured speed.}
+		\label{fig:ppi_time_speed}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../img/PPI_validation/position_error.png}
+		\caption{Position tracking error.}
+		\label{fig:ppi_time_position_error}
+	\end{subfigure}
+	\caption{Pole-placement time-domain validation with ramp reference.}
+	\label{fig:ppi_time_validation}
 \end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.9\textwidth]{../img/PPI_validation/speed.png}
-	\caption{Measured speed during ramp validation.}
-	\label{fig:ppi_time_speed}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.9\textwidth]{../img/PPI_validation/position_error.png}
-	\caption{Position tracking error during ramp validation.}
-	\label{fig:ppi_time_position_error}
-\end{figure}
-
 
 

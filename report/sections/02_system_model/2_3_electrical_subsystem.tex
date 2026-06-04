@@ -12,7 +12,7 @@
         -- (0,0);
     \end{circuitikz}
     }
-    \caption{Electrical model of the electromagnet circuit}
+    \caption{Electrical model of the electromagnet circuit.}
     \label{fig:rl_detailed}
 \end{figure}
 
@@ -22,15 +22,12 @@ The electromagnet is modelled as a resistor-inductor circuit. If $v_c(t)$ is the
     \label{eq:electrical_rl}
 \end{equation}
 
-The resistor $R$ includes coil resistance $R_c$, sense resistance $R_s$.\\
-\textcolor{red}{RESISTANCE CALIBRATION}
-In addition the exact resistance value can be affected by variations and manufacturing tolerances.
-Therefore the value is calibrated with the gain $R_{cal}$ obtained from the current measurement.
+The equivalent resistance $R$ includes the coil resistance $R_c$ and the current-sense resistance $R_s$.
+Since the actual resistance is affected by tolerances and temperature variations, it is corrected by
+the calibration factor $R_{cal}$ obtained from current measurements:
 \[
 R = R_{cal}(R_c + R_s)
 \]
-
-\textcolor{red}{INDUCTANCE CALIBRATION??}
 
 When the amplifier gain is included, the coil voltage can be written as
 \begin{equation}
@@ -54,12 +51,12 @@ where
 \]
 is the characteristic frequency of the electrical subsystem, while the corresponding stable pole is
 $p_i = -\omega_i$.
-Then the time constant is $\tau_i = \frac{1}{\omega_i} \backsimeq 0.044~\mathrm{s}$.
+The corresponding time constant is $\tau_i = \frac{1}{\omega_i} \backsimeq 0.044~\mathrm{s}$.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{../img/models/BODE_Gi.png}
-    \caption{Bode diagram of $G_i$}
+    \caption{Bode diagram of $G_i(s)$.}
     \label{fig:bode_gi}
 \end{figure}
 
@@ -68,7 +65,7 @@ Then the time constant is $\tau_i = \frac{1}{\omega_i} \backsimeq 0.044~\mathrm{
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.9\textwidth]{../img/models/RL_model.png}
-	\caption{Nonlinear RL model validation}
+	\caption{RL model validation.}
 	\label{fig:rl_model_validation}
 \end{figure}
 
@@ -95,5 +92,4 @@ from the 10--90\% rise time, assuming a first-order step response:
 \]
 The two values are therefore not expected to be exactly identical. The simulated response is close to
 the nominal value, while the measured response can differ because of parameter uncertainty, amplifier
-dynamics, sampling, noise.
-
+dynamics, sampling and noise.

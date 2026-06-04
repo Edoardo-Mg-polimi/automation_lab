@@ -1,11 +1,10 @@
 \subsection{Problem statement and control objectives}
-\textcolor{red}{SHOULD WE CANCEL THIS PART?}
 This report details the design, simulation, and experimental validation of control strategies for a magnetic levitation system.
 Controlling this system presents two fundamental physical challenges: it is inherently open-loop unstable (the ball cannot naturally hover),
 and the electromagnetic attractive force is highly non-linear.
 Consequently, standard linear control formulations are only strictly valid within a bounded region around a defined equilibrium point. 
 
-Control Objectives To safely stabilize the plant and overcome these non-linearities, the control architecture is decoupled into this progressive objectives: 
+The control architecture is organized around two main objectives:
 
 \begin{enumerate}[label=\textbf{O\arabic*.},leftmargin=1.4cm]
     \item \textbf{Coil current control.} The electrical dynamics of the coil are regulated by an inner current loop.

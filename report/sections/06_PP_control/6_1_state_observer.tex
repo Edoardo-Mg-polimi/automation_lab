@@ -139,8 +139,8 @@ In \texttt{SS\_model\_PP.m} the observer poles are placed at
 \begin{equation}
     p_{obs} = \{-500, -600\}.
 \end{equation}
-Those poles are chosen to be significantly faster than the closed-loop poles of the system,
-in order to ensure a good estimation performance.
+These poles are chosen significantly faster than the closed-loop poles to obtain a sufficiently fast
+estimate without relying on numerical differentiation.
 
 The observer gain is computed with
 \begin{equation}
@@ -149,8 +149,8 @@ The observer gain is computed with
 
 
 \paragraph{Ackermann's formula}
-Since $(A_x,C_x)$ is observable, the dual pair $(A_x^T,C_x^T)$ is controllable, also the subsystem is SI(Single Input),
-therefore Ackermann's formula can be applied to compute the observer gain. Defining
+Since $(A_x,C_x)$ is observable, the dual pair $(A_x^T,C_x^T)$ is controllable. Therefore
+Ackermann's formula can be applied to compute the observer gain. Defining
 \begin{equation}
     \mathcal{C}_d =
     \begin{bmatrix}
@@ -180,5 +180,4 @@ The resulting observer dynamics are
     +
     L_{obs} \Delta x_{\mathrm{meas}}.
 \end{equation}
-
 

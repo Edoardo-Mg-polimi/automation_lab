@@ -1,6 +1,6 @@
 \subsection{Real system implementation and validation}
 \subsubsection{Time-Domain Validation}
-The following sets of weights were tested during the time-domain validation:
+Table~\ref{tab:lqri_time_parameters} reports the LQRI tunings tested during the time-domain validation.
 \begin{table}[H]
 \centering
 \caption{LQR with integral action parameters used for time-domain validation.}
@@ -18,38 +18,42 @@ Test file & $Q_1$ & $Q_2$ & $Q_3$ & $Q_4$ & $R$ \\
 \end{tabular}
 \end{table}
 
-The table summarizes the practical retuning process. Increasing the velocity weight and adapting the
-integral-state weight reduced oscillations on the real setup.
-
-The representative log shows tracking around $7~\mathrm{mm}$, with visible measurement noise and some
-spikes. This confirms the need for the Kalman speed estimate.
+Increasing the velocity weight and adapting the integral-state weight reduced oscillations on the real setup.
+The representative log tracks the $7~\mathrm{mm}$ operating point with visible sensor noise and spikes,
+motivating the Kalman speed estimate.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.88\textwidth]{../img/LQRI_validation/time/ramp.png}
-    \caption{LQI time-domain position tracking on the real setup.}
-    \label{fig:lqri_time_position}
-\end{figure}
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../img/LQRI_validation/time/ramp.png}
+        \caption{Position tracking.}
+        \label{fig:lqri_time_position}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../img/LQRI_validation/time/error.png}
+        \caption{Position error.}
+        \label{fig:lqri_time_error}
+    \end{subfigure}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.88\textwidth]{../img/LQRI_validation/time/error.png}
-    \caption{Position error during LQI time-domain validation.}
-    \label{fig:lqri_time_error}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.88\textwidth]{../img/LQRI_validation/time/current.png}
-    \caption{Current tracking during LQI time-domain validation.}
-    \label{fig:lqri_time_current}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.88\textwidth]{../img/LQRI_validation/time/speed.png}
-    \caption{Kalman-filter velocity estimate compared with the derivative-based speed signal.}
-    \label{fig:lqri_time_speed}
+    \vspace{0.5em}
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../img/LQRI_validation/time/current.png}
+        \caption{Current tracking.}
+        \label{fig:lqri_time_current}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../img/LQRI_validation/time/speed.png}
+        \caption{Velocity estimates.}
+        \label{fig:lqri_time_speed}
+    \end{subfigure}
+    \caption{LQRI time-domain validation on the real setup.}
+    \label{fig:lqri_time_validation}
 \end{figure}
 
 
@@ -86,14 +90,14 @@ $15$ & $2.3800$ & $-17.31$ & $-175.8$ \\
     \begin{subfigure}[t]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../img/LQRI_validation/simulation/LQR_1_rad.png}
-        \caption{Simulation, reference $\omega = 1$ rad/s}
+        \caption{Simulation, reference $\omega = 1$ rad/s.}
         \label{fig:lqr_1_rad_simulation}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../img/LQRI_validation/frequency/LQR_1_rad.png}
-        \caption{Experimental response, reference $\omega = 1$ rad/s}
+        \caption{Experimental response, reference $\omega = 1$ rad/s.}
         \label{fig:lqr_1_rad}
     \end{subfigure}
     \caption{LQRI validation for a sinusoidal reference with $\omega = 1$ rad/s.}
@@ -105,17 +109,16 @@ $15$ & $2.3800$ & $-17.31$ & $-175.8$ \\
     \begin{subfigure}[t]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../img/LQRI_validation/simulation/LQR_6_rad.png}
-        \caption{Simulation, reference $\omega = 6$ rad/s}
+        \caption{Simulation, reference $\omega = 6$ rad/s.}
         \label{fig:lqr_6_rad_simulation}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../img/LQRI_validation/frequency/LQR_6_rad.png}
-        \caption{Experimental response, reference $\omega = 6$ rad/s}
+        \caption{Experimental response, reference $\omega = 6$ rad/s.}
         \label{fig:lqr_6_rad}
     \end{subfigure}
     \caption{LQRI validation for a sinusoidal reference with $\omega = 6$ rad/s.}
     \label{fig:lqri_validation_6_rad}
 \end{figure}
-

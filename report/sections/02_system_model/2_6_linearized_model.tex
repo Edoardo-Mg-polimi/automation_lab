@@ -71,8 +71,7 @@ The equilibrium point is defined by imposing zero velocity and zero acceleration
     \dot{x}_1 = 0, \qquad \dot{x}_2 = 0, \qquad \dot{x}_3 = 0.
 \end{equation*}
 
-In this case there is no intertial force.
-Therefore:
+At equilibrium the inertial term is zero, therefore
 \begin{equation*}
     F_m = mg
 \end{equation*}
@@ -86,11 +85,12 @@ For a selected equilibrium air gap $x_e$, the corresponding equilibrium current 
     i_e = \sqrt{\frac{m g}{K_m}} (l - x_e - 2r).
     \label{eq:equilibrium_current}
 \end{equation}
-As we can see $i_e$ and $x_e$ are linearly dependent. The equilibrium point is not unique, so we can select a $x_e$
-as a design parameter and then compute $i_e$ from \eqref{eq:equilibrium_current}.
+The quantities $i_e$ and $x_e$ are linearly related. Therefore the equilibrium point is not unique:
+$x_e$ can be selected as a design parameter and $i_e$ can then be computed from
+\eqref{eq:equilibrium_current}.
 
-We select $x_e = \frac{l}{2} - r = 7$ mm. Exactely in the middle between the sensor and the electromagnet.
-Then 
+The selected operating point is $x_e = \frac{l}{2} - r = 7$ mm, corresponding to the middle of
+the admissible travel range. Then
 \begin{equation*}
 \begin{aligned}
 i_e 
@@ -117,7 +117,7 @@ In the implemented controllers, it is important to distinguish absolute variable
 \end{equation*}
 
 \subsubsection{Linearization}
-The coplete model considering $v_c = K_g u$
+Considering $v_c = K_g u$, the complete model is
 \[
 \begin{cases}
     \dot{x}_1 = x_2 \\[2mm]
