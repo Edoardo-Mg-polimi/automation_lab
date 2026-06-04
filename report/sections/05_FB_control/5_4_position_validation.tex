@@ -1,9 +1,8 @@
 \subsection{Position validation}
 
-\subsubsection{Simulation testing}
-
-The controller is first tested in simulation on the linear model and then on the nonlinear model. 
-The comparison allows us to evaluate the validity of the linear approximation and the effect of saturation.
+%\subsubsection{Simulation testing}
+%The controller is first tested in simulation on the linear model and then on the nonlinear model. 
+%The comparison allows us to evaluate the validity of the linear approximation and the effect of saturation.
 
 % \begin{figure}[H]
 %     \centering
@@ -12,23 +11,64 @@ The comparison allows us to evaluate the validity of the linear approximation an
 %     \label{fig:fb_step_simulation}
 % \end{figure}
 
-The final controller is implemented in Simulink and tested on the physical setup. The experimental response is compared with the simulated one.
+%The final controller is implemented in Simulink and tested on the physical setup. The experimental response is compared with the simulated one.
 
 \subsubsection{Time-Domain Validation}
 The time-domain validation of the position control was performed by injecting the system with a constant reference equal to the equilibrium position.
 To improve the system response during the initial part, a slope limit was added to the position reference so that the reference would reach its final value in 4 seconds.
-The results are shown in Figure G, H, I. 
-\textcolor{red}{grafico validazioni nel tempo}
+The results are shown in Figures~\ref{fig:fb_position_time_validation}, \ref{fig:fb_position_time_current}, and~\ref{fig:fb_position_time_error}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../img/FB_validation/time/FB_Position_Control_TimeValidation_PositionTrackingComparison.png}
+    \caption{Time-domain position validation.}
+    \label{fig:fb_position_time_validation}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../img/FB_validation/time/FB_Position_Control_TimeValidation_CurrentTracking.png}
+    \caption{Time-domain current during position validation.}
+    \label{fig:fb_position_time_current}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../img/FB_validation/time/FB_Position_Control_TimeValidation_Error.png}
+    \caption{Time-domain position error during validation.}
+    \label{fig:fb_position_time_error}
+\end{figure}
+
 
 \paragraph{Neighborhood of linearized point}
 Of particular interest are the tests in which the reference signal’s constant value was changed during the experiment to test the stability limits of the system. The results are shown in Figure L, M.
 The worse performance on the decreasing position reference tracking is probably to attribute to the consecutive use of the hardware. 
 
-\textcolor{red}{grafici con riferimento a gradino che cambia...}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../img/FB_validation/time/FB_Position_Control_IncreasingReference.png}
+    \caption{Position tracking with increasing reference.}
+    \label{fig:fb_position_increasing_reference}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../img/FB_validation/time/FB_Position_Control_DecreasingReference.png}
+    \caption{Position tracking with decreasing reference.}
+    \label{fig:fb_position_decreasing_reference}
+\end{figure}
+
 
 \subsubsection{Frequency-Domain Validation}
-
-Report here the measured sinusoidal responses and the comparison with the predicted frequency response.
+The frequency-domain validation of the position control was done by injecting the real system with different sine wave references,
+around the equilibrium position, at various frequencies.
+The frequencies chosen for this validation were 1,6,20 [rad/s].
+The results were then stored as data, processed and shown in the following section.  
+Prior to frequency response extraction, the measured signals were filtered (using MATLAB's “filtfilt”) to remove high-frequency noise.
+The cutoff frequency was selected for each test case, ensuring the fundamental sinusoidal component was preserved while suppressing noise. The cutoff frequencies used are summarized in Table X.
+The filtered validations are shown in Figure C,D,E.
+Using a MATLAB script, the values of Magnitude and Phase variation were extracted from the data.
+This values are available in Table B. Comparing these values with the Bode Diagram of the model (Figure F),
+we can see that the values are consistent. 
 
 \begin{figure}[H]
     \centering
