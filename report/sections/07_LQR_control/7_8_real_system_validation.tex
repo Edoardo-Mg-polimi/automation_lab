@@ -1,14 +1,5 @@
 \subsection{Real system implementation and validation}
-Different tunings of $Q_{aug}$ and $R_{aug}$ were evaluated both in simulation and on the real apparatus.
-However, the tuning configurations providing satisfactory simulated performance did not always achieve comparable results
-on the physical system, and vice versa.
-This discrepancy is likely due to model mismatch, significant parameter uncertainties,
-unmodelled nonlinearities and time-varying operating conditions affecting the real magnetic levitation system.
-
 \subsubsection{Time-Domain Validation}
-The time-domain logs in \texttt{data/03\_position/LQR/time} contain reference and measured position,
-Kalman-filter speed, reference and measured current, and position error.
-
 The following sets of weights were tested during the time-domain validation:
 \begin{table}[H]
 \centering
@@ -71,6 +62,24 @@ The frequency-domain validation is performed with sinusoidal references at
 
 The measured sinusoidal response is compared with the predicted frequency response in terms of
 attenuation and phase shift.
+For the numerical estimation, the first $5~\mathrm{s}$ of each log are discarded so that the
+transient part does not affect the attenuation and phase calculations.
+
+\begin{table}[H]
+\centering
+\caption{Frequency-domain validation metrics after discarding the first $5~\mathrm{s}$.}
+\label{tab:lqri_frequency_validation_metrics}
+\begin{tabular}{cccc}
+\toprule
+Reference $\omega$ & Dominant frequency & Attenuation & Phase shift \\
+$[\mathrm{rad/s}]$ & $[\mathrm{Hz}]$ & $[\mathrm{dB}]$ & $[^\circ]$ \\
+\midrule
+$1$  & $0.1526$ & $-9.97$  & $30.25$ \\
+$6$  & $0.9613$ & $-3.49$  & $-105.3$ \\
+$15$ & $2.3800$ & $-17.31$ & $-175.8$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{figure}[H]
     \centering
@@ -109,5 +118,4 @@ attenuation and phase shift.
     \caption{LQRI validation for a sinusoidal reference with $\omega = 6$ rad/s.}
     \label{fig:lqri_validation_6_rad}
 \end{figure}
-
 

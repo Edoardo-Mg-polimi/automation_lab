@@ -21,6 +21,40 @@ The nominal simulation tuning is
 This tuning works in simulation but not on the real setup. The real system needs a different tuning due
 to noise, nonlinearities, current saturation and calibration errors.
 
+\paragraph{Stability margins}
 
+The stability margins were evaluated on the open-loop transfer function associated with the
+state-feedback law, not on the closed-loop transfer function $H_x(s)$. Since MATLAB's
+\texttt{margin} command assumes negative feedback, the loop function is written without
+the minus sign of the control law:
+\begin{equation}
+    L_{lqi}(s) =
+    K_{aug}\left(sI-A_{aug}\right)^{-1}B_{aug},
+\end{equation}
+where the closed-loop transfer function from the position reference to the position output is denoted
+as $H_x(s)$.
 
-\subsubsection{Stability margins}
+\begin{table}[H]
+\centering
+\caption{Stability margins of the LQRI open-loop transfer function.}
+\label{tab:lqri_stability_margins}
+\begin{tabular}{ccccc}
+\toprule
+Gain margin & Gain margin & Phase margin & Phase-crossover & Gain-crossover \\
+ & $[\mathrm{dB}]$ &  & frequency & frequency \\
+\midrule
+$\infty$ & $\infty$ & $78.35^\circ$ & not reached & $551.33~\mathrm{rad/s}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The infinite gain margin indicates that no phase-crossover frequency is reached in the analysed
+frequency range. The phase margin remains positive and sufficiently large. The closed-loop
+position bandwidth is approximately $2.95~\mathrm{rad/s}$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../img/LQRI_validation/BODE_Hx_LQRI.png}
+    \caption{Bode diagram of the closed-loop position transfer function $H_x(s)$.}
+    \label{fig:bode_hx_lqri}
+\end{figure}

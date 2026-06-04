@@ -1,4 +1,5 @@
-clear; close all; clc;
+function plot_LQR_sine()
+close all; clc;
 
 scriptDir = fileparts(mfilename('fullpath'));
 files = {
@@ -14,6 +15,7 @@ labels = {
 };
 col_ref = [0 0 1];
 col_meas = [1 0 0];
+settlingTime = 5; % [s] samples before this time are discarded for metrics
 
 % FREQUENZE DI TAGLIO PER IL FILTRO PASSA BASSO, IN BASE ALLA FREQUENZA DI INTERESSE
 w = [2, 10, 17]; % [rad/s]
@@ -22,7 +24,7 @@ for k = 1:numel(files)
     [t, x_ref, x_meas] = loadFrequencySignal(files{k});
     lowPassCutoffHz = w(k)/(2*pi); % [Hz]
     [x_meas_filt, filtInfo] = lowpassNumeric(t, x_meas, lowPassCutoffHz);
-    metrics = computeFrequencyMetrics(t, x_ref, x_meas_filt);
+    metrics = computeFrequencyMetrics(t, x_ref, x_meas_filt, settlingTime);
 
     figure('Color', 'w', 'Name', labels{k});
     hold on;
@@ -41,6 +43,7 @@ end
 
 % Grafico del filtro passa basso
 plotFilterResponse(filtInfo);
+end
 
 
 function [t, x_ref, x_meas] = loadFrequencySignal(filePath)
@@ -78,10 +81,15 @@ function [x_filt, filtInfo] = lowpassNumeric(t, x, cutoffHz)
     order = 2;
     Wn = cutoffHz / (fs/2);
 
-    [b, a] = butter(order, Wn, 'low');
+    if exist('butter', 'file') && exist('filtfilt', 'file')
+        [b, a] = butter(order, Wn, 'low');
 
-    % Filtro zero-phase, avanti e indietro
-    x_filt = filtfilt(b, a, x);
+        % Filtro zero-phase, avanti e indietro
+        x_filt = filtfilt(b, a, x);
+    else
+        [b, a] = butterworthSecondOrderLowpass(cutoffHz, fs);
+        x_filt = filtfiltFallback(b, a, x);
+    end
 
     x_filt = x_filt.';
 
@@ -104,7 +112,7 @@ function plotFilterResponse(filtInfo)
     n = 4096;
 
     % Risposta in frequenza del filtro
-    [H, f] = freqz(b, a, n, fs);
+    [H, f] = filterFrequencyResponse(b, a, n, fs);
 
     % Modulo del filtro applicato una volta
     magSingleDb = 20*log10(abs(H));
@@ -144,10 +152,69 @@ function plotFilterResponse(filtInfo)
     title('Single-pass phase response');
 end
 
-function metrics = computeFrequencyMetrics(t, referenceSignal, measuredSignal)
+function [b, a] = butterworthSecondOrderLowpass(cutoffHz, fs)
+    K = tan(pi * cutoffHz / fs);
+    normFactor = 1 + sqrt(2) * K + K^2;
+
+    b = [K^2, 2*K^2, K^2] / normFactor;
+    a = [1, 2*(K^2 - 1) / normFactor, ...
+        (1 - sqrt(2)*K + K^2) / normFactor];
+end
+
+function y = filtfiltFallback(b, a, x)
+    yForward = directFormFilter(b, a, x(:));
+    yBackward = directFormFilter(b, a, flipud(yForward));
+    y = flipud(yBackward);
+end
+
+function y = directFormFilter(b, a, x)
+    x = x(:);
+    y = zeros(size(x));
+
+    for n = 1:numel(x)
+        acc = 0;
+
+        for i = 1:numel(b)
+            if n - i + 1 > 0
+                acc = acc + b(i) * x(n - i + 1);
+            end
+        end
+
+        for i = 2:numel(a)
+            if n - i + 1 > 0
+                acc = acc - a(i) * y(n - i + 1);
+            end
+        end
+
+        y(n) = acc / a(1);
+    end
+end
+
+function [H, f] = filterFrequencyResponse(b, a, n, fs)
+    f = linspace(0, fs/2, n).';
+    zInv = exp(-1i * 2*pi*f / fs);
+    numerator = zeros(size(zInv));
+    denominator = zeros(size(zInv));
+
+    for idx = 1:numel(b)
+        numerator = numerator + b(idx) * zInv.^(idx - 1);
+    end
+
+    for idx = 1:numel(a)
+        denominator = denominator + a(idx) * zInv.^(idx - 1);
+    end
+
+    H = numerator ./ denominator;
+end
+
+function metrics = computeFrequencyMetrics(t, referenceSignal, measuredSignal, settlingTime)
     t = double(t(:).');
     referenceSignal = double(referenceSignal(:).');
     measuredSignal = double(measuredSignal(:).');
+
+    if nargin < 4 || isempty(settlingTime)
+        settlingTime = 0;
+    end
 
     nSamples = min([numel(t), numel(referenceSignal), numel(measuredSignal)]);
     metrics = struct('attenuationDb', NaN, 'phaseShiftDeg', NaN, 'dominantFrequencyHz', NaN);
@@ -169,10 +236,14 @@ function metrics = computeFrequencyMetrics(t, referenceSignal, measuredSignal)
     referenceSignal = referenceSignal(validMask);
     measuredSignal = measuredSignal(validMask);
 
-    startIdx = max(1, floor(0.5 * numel(t)));
-    t = t(startIdx:end);
-    referenceSignal = referenceSignal(startIdx:end);
-    measuredSignal = measuredSignal(startIdx:end);
+    settledMask = t >= settlingTime;
+    if nnz(settledMask) < 8
+        return;
+    end
+
+    t = t(settledMask);
+    referenceSignal = referenceSignal(settledMask);
+    measuredSignal = measuredSignal(settledMask);
 
     if numel(t) < 8
         return;
