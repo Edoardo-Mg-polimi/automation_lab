@@ -62,13 +62,42 @@ The worse performance on the decreasing position reference tracking is probably 
 The frequency-domain validation of the position control was done by injecting the real system with different sine wave references,
 around the equilibrium position, at various frequencies.
 The frequencies chosen for this validation were 1,6,20 [rad/s].
-The results were then stored as data, processed and shown in the following section.  
-Prior to frequency response extraction, the measured signals were filtered (using MATLAB's “filtfilt”) to remove high-frequency noise.
-The cutoff frequency was selected for each test case, ensuring the fundamental sinusoidal component was preserved while suppressing noise. The cutoff frequencies used are summarized in Table X.
-The filtered validations are shown in Figure C,D,E.
+The results were then stored as data ad processed with MATLAB script.
+
+
+Prior to frequency response extraction, the measured signals were filtered, using MATLAB's numerical low-pass filter \textit{filtfilt} in order
+to remove high-frequency noise.
+The cutoff frequency was selected for each test case, ensuring the fundamental sinusoidal component was preserved while suppressing noise.
+The cutoff frequencies used are:
+
+\textcolor{red}{DA CABIARE FREQUENZE DI TAGLIO}
+
+\begin{table}[H]
+    \centering
+    \caption{Frequency response experimental results.}
+    \label{tab:frequency_response_results}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{cccccc}
+        \toprule
+        \shortstack{Sine Wave Frequency \\ $[\mathrm{rad/s}]$} &
+        \shortstack{Sine Wave Frequency \\ $[\mathrm{Hz}]$} &
+        \shortstack{Cutoff Frequency \\ $[\mathrm{Hz}]$} &
+        \shortstack{Cutoff Frequency \\ $[\mathrm{rad/s}]$} &
+        \shortstack{Magnitude \\ $[\mathrm{dB}]$} &
+        \shortstack{Phase \\ $[\mathrm{deg}]$} \\
+        \midrule
+        $1$  & $0{,}159235669$ & $1$ & $6{,}283185$  & $-0{,}09$ & $-8{,}25$  \\
+        $6$  & $0{,}955414013$ & $1$ & $6{,}283185$  & $-7{,}25$ & $-54{,}04$ \\
+        $20$ & $3{,}184713376$ & $3$ & $18{,}849556$ & $-9{,}79$ & $-94{,}15$ \\
+        \bottomrule
+    \end{tabular}
+    }
+\end{table}
+
 Using a MATLAB script, the values of Magnitude and Phase variation were extracted from the data.
-This values are available in Table B. Comparing these values with the Bode Diagram of the model (Figure F),
-we can see that the values are consistent. 
+This values are available in Table B. Comparing these values with the Bode Diagram of the model in \figref{fig:bode_hp},
+we can see that the values are consistent.
+
 
 \begin{figure}[H]
     \centering
@@ -85,9 +114,9 @@ we can see that the values are consistent.
     \label{fig:fb_6_rad}
 \end{figure}
 
-%\begin{figure}[H]
-%    \centering
-%    \includegraphics[width=0.9\textwidth]{../img/FB_validation/frequency/FB_20_rad.png}
-%    \caption{Reference  $\omega = 20$ rad/s}
-%    \label{fig:fb_20_rad}
-%\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../img/FB_validation/frequency/FB_20_rad.png}
+    \caption{Reference  $\omega = 20$ rad/s}
+    \label{fig:fb_20_rad}
+\end{figure}

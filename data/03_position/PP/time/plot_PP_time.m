@@ -1,48 +1,157 @@
 clear; close all; clc;
 
 scriptDir = fileparts(mfilename('fullpath'));
+matFiles = dir(fullfile(scriptDir, '*.mat'));
 
-files = {
-    fullfile(scriptDir, 'PP_validation_poles_1_80_85.mat')
-    fullfile(scriptDir, 'PP_validation_poles_2_80_85.mat')
-    fullfile(scriptDir, 'PP_validation_poles_3_70_75_with_integral_sat.mat')
-    fullfile(scriptDir, 'PP_validation_poles_5_75_80.mat')
-};
+if isempty(matFiles)
+    error('No .mat files found in %s.', scriptDir);
+end
 
-labels = {
-    'PP poles 1, 80-85'
-    'PP poles 2, 80-85'
-    'PP poles 3, 70-75, integral sat'
-    'PP poles 5, 75-80'
-};
+[~, order] = sort({matFiles.name});
+matFiles = matFiles(order);
 
-figure;
-hold on; grid on;
+specialFileName = 'PP_validation_poles_3_70_75_with_integral_sat.mat';
+simFile = fullfile(scriptDir, '..', '..', '..', '..', ...
+    'matlab', '03_PP_position', 'PPI_NL_simulation_ramp.mat');
 
+col_ref = [0 0 1];
 col_meas = [1 0 0];
+col_sim = [0 0.6 0];
 
-for k = 1:length(files)
-    S = load(files{k});
-    varName = fieldnames(S);
-    data = S.(varName{1});
+for k = 1:numel(matFiles)
+    filePath = fullfile(matFiles(k).folder, matFiles(k).name);
+    data = loadNumericMatrix(filePath);
+    baseLabel = erase(matFiles(k).name, '.mat');
+
+    validateMeasuredData(data, matFiles(k).name);
+
+    t = data(1, :);
+    x_ref = data(2, :);
+    x_meas = data(3, :);
+    speed_filt = data(6, :);
+    speed_obs = data(7, :);
+    i_ref = data(8, :);
+    i_meas = data(9, :);
+
+    simData = [];
+    if strcmp(matFiles(k).name, specialFileName)
+        if ~isfile(simFile)
+            warning('Simulation file not found: %s', simFile);
+        else
+            simData = loadNumericMatrix(simFile);
+            validateSimulationData(simData, simFile);
+        end
+    end
+
+    plotPosition(t, x_ref, x_meas, simData, baseLabel, col_ref, col_meas, col_sim);
+    plotCurrent(t, i_ref, i_meas, baseLabel, col_ref, col_meas);
+    plotObserverSpeed(t, speed_filt, speed_obs, baseLabel, col_ref, col_meas);
+
+    metrics = compute_system_metrics(t, x_meas, x_ref, []);
+    print_system_metrics(baseLabel, metrics);
+end
+
+function data = loadNumericMatrix(filePath)
+    S = load(filePath);
+    data = findNumericMatrix(S);
+
+    if isempty(data)
+        error('No numeric matrix found in %s.', filePath);
+    end
+
+    data = double(data);
+
+    if isvector(data)
+        error('Expected a 2-D numeric matrix in %s.', filePath);
+    end
 
     if size(data, 1) > size(data, 2) && size(data, 2) <= 32
         data = data.';
     end
-
-    t = data(1, :);
-    x_meas = data(3, :);
-
-    plot(t, x_meas, 'Color', col_meas, 'LineWidth', 1.3);
-
-    metrics = compute_system_metrics(t, x_meas, data(2, :), []);
-    print_system_metrics(labels{k}, metrics);
 end
 
-xlabel('Time [s]');
-ylabel('Measured position [m]');
-title('Measured position comparison');
-legend(labels, 'Interpreter', 'none', 'Location', 'best');
+function data = findNumericMatrix(value)
+    data = [];
+
+    if isnumeric(value) && ismatrix(value) && numel(value) > 1
+        data = value;
+        return;
+    end
+
+    if isstruct(value)
+        names = fieldnames(value);
+        for idx = 1:numel(names)
+            candidate = findNumericMatrix(value.(names{idx}));
+            if ~isempty(candidate)
+                data = candidate;
+                return;
+            end
+        end
+    end
+end
+
+function validateMeasuredData(data, fileName)
+    if size(data, 1) < 9
+        error(['Expected at least 9 rows in %s: time, position reference, ', ...
+            'measured position, speed signals and currents.'], fileName);
+    end
+end
+
+function validateSimulationData(data, fileName)
+    if size(data, 1) < 3
+        error('Expected at least time, position reference and simulated position in %s.', fileName);
+    end
+end
+
+function plotPosition(t, x_ref, x_meas, simData, baseLabel, col_ref, col_meas, col_sim)
+    figure('Color', 'w', 'Name', [baseLabel ' - position']);
+    hold on; grid on; box on;
+
+    plot(t, x_ref, 'Color', col_ref, 'LineWidth', 1.4, ...
+        'DisplayName', 'Position reference');
+    plot(t, x_meas, 'Color', col_meas, 'LineWidth', 1.3, ...
+        'DisplayName', 'Measured position');
+
+    if ~isempty(simData)
+        plot(simData(1, :), simData(3, :), '--', 'Color', col_sim, 'LineWidth', 1.5, ...
+            'DisplayName', 'Simulated position');
+    end
+
+    xlabel('Time [s]');
+    ylabel('Position [m]');
+    title(sprintf('PP position - %s', baseLabel), 'Interpreter', 'none');
+    legend('show', 'Interpreter', 'none', 'Location', 'best');
+end
+
+function plotCurrent(t, i_ref, i_meas, baseLabel, col_ref, col_meas)
+    figure('Color', 'w', 'Name', [baseLabel ' - current']);
+    hold on; grid on; box on;
+
+    plot(t, i_ref, 'Color', col_ref, 'LineWidth', 1.4, ...
+        'DisplayName', 'Current reference');
+    plot(t, i_meas, 'Color', col_meas, 'LineWidth', 1.3, ...
+        'DisplayName', 'Measured current');
+
+    xlabel('Time [s]');
+    ylabel('Current [A]');
+    title(sprintf('PP current - %s', baseLabel), 'Interpreter', 'none');
+    legend('show', 'Interpreter', 'none', 'Location', 'best');
+end
+
+function plotObserverSpeed(t, speed_filt, speed_obs, baseLabel, col_ref, col_meas)
+    figure('Color', 'w', 'Name', [baseLabel ' - observer speed']);
+    hold on; grid on; box on;
+
+    plot(t, speed_filt, 'Color', col_ref, 'LineWidth', 1.4, ...
+        'DisplayName', 'Filtered derivative speed');
+    plot(t, speed_obs, 'Color', col_meas, 'LineWidth', 1.3, ...
+        'DisplayName', 'Observer speed');
+
+    xlabel('Time [s]');
+    ylabel('Speed [m/s]');
+    title(sprintf('PP observer speed - %s', baseLabel), 'Interpreter', 'none');
+    legend('show', 'Interpreter', 'none', 'Location', 'best');
+end
 
 function metrics = compute_system_metrics(t, y, ref, inputSignal)
     t = t(:).';

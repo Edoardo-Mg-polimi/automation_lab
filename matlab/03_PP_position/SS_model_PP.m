@@ -305,7 +305,7 @@ H_x = ss(A_cl_aug, Br_aug, C_aug, 0);
 figure
 bode(H_x)
 grid on
-title('Bode H_x(s) controlled closed loop PP')
+title('Bode H_x(s) controlled closed loop PPI')
 
 
 

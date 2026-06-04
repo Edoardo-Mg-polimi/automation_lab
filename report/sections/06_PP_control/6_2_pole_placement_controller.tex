@@ -1,61 +1,319 @@
 \subsection{Pole placement controller}
+\begin{figure}[H]
+    \centering
+    \resizebox{0.98\textwidth}{!}{%
+    \begin{tikzpicture}[
+        >=Latex,
+        every node/.style={font=\scriptsize},
+        block/.style={
+            draw,
+            rectangle,
+            minimum width=1.15cm,
+            minimum height=0.62cm,
+            align=center
+        },
+        smallblock/.style={
+            draw,
+            rectangle,
+            minimum width=0.65cm,
+            minimum height=0.55cm,
+            align=center
+        },
+        obsblock/.style={
+            draw,
+            rectangle,
+            minimum width=1.9cm,
+            minimum height=0.95cm,
+            align=center
+        },
+        mux/.style={
+            draw,
+            rectangle,
+            minimum width=0.25cm,
+            minimum height=1.75cm,
+            align=center
+        },
+        sum/.style={
+            draw,
+            circle,
+            minimum size=3.0mm,
+            inner sep=0pt
+        },
+        line/.style={->, thick},
+        signal/.style={thick},
+        branch/.style={circle, fill=black, inner sep=1.15pt}
+    ]
+
+    % =========================================================
+    % Main blocks
+    % =========================================================
+
+    %Reference input blocks
+    \node (xref) at (-2.5,-0.58) {$x_{ref}$};
+    \node[sum] (sumx) at (-1.15,-0.58) {};
+    \node[smallblock] (int) at (0.15,-0.58) {$\dfrac{1}{s}$};
+
+    \node[mux] (mux) at (3.0,0) {MUX};
+
+    % Manual triangular gain, pointing right
+    \coordinate (Kin)  at (4.15,0);
+    \coordinate (Ktop) at (4.15,0.55);
+    \coordinate (Kbot) at (4.15,-0.55);
+    \coordinate (Kout) at (5.0,0);
+
+    \draw[thick] (Ktop) -- (Kout) -- (Kbot) -- cycle;
+    \node at (4.48,0) {$K_{\mathrm{ppi}}$};
+
+    \node[sum] (sumi) at (5.80,0) {};
+    \node[smallblock] (ie) at (5.80,0.95) {$i_e$};
+    \node[block] (sat) at (7.5,0) {Current\\sat.};
+    \node[smallblock] (Hi) at (9.5,0) {$H_i(s)$};
+    \node[smallblock] (Gx) at (11.5,0) {$G_x(s)$};
+
+    % Observer block
+    \node[obsblock] (obs) at (6.30,+3.0) {State\\Observer};
+
+    % =========================================================
+    % Sum signs
+    % =========================================================
+
+    \node at ($(sumx.west)+(-0.1,0.2)$) {$+$};
+    \node at ($(sumx.south)+(-0.2,-0.1)$) {$-$};
+
+    \node at ($(sumi.north)+(0.15,+0.10)$) {$+$};
+    \node at ($(sumi.west)+(-0.10,-0.15)$) {$+$};
+    %\node at ($(sumi)$) {$+$};
+
+    % =========================================================
+    % Forward path
+    % =========================================================
+
+    \draw[line] (xref) -- (sumx);
+    \draw[line] (sumx) -- node[above] {$e_x$} (int);
+
+    \draw[line] (mux.east) -- node[above] {$x_{\mathrm{aug}}$} (Kin);
+    \draw[line] (Kout) -- node[above] {$i_{PP}$} (sumi);
+    \draw[line] (ie) -- (sumi);
+
+    \draw[line] (sumi) -- node[above] {$i_{ref}$} (sat);
+    \draw[line] (sat) -- (Hi);
+    \draw[line] (Hi) -- node[above] {$i$} (Gx);
+    \draw[line] (Gx.east) -- ++(1.1,0) coordinate (xout) node[right] {$x$};
+
+    % =========================================================
+    % Signal taps
+    % =========================================================
+
+    \coordinate (itap) at ($(Hi.east)!0.50!(Gx.west)$);
+    \node[branch] at (itap) {};
+
+    \coordinate (xtap) at ($(Gx.east)+(0.45,0)$);
+    \node[branch] at (xtap) {};
+
+    % =========================================================
+    % Position feedback to error
+    % routed above everything
+    % =========================================================
+
+    \draw[signal] (xtap) |- (-1.15,-2.35);
+    \draw[line] (-1.15,-2.35) -- (sumx.south);
+
+    % =========================================================
+    % MUX input coordinates
+    % order: x, xdot_hat, i, xi
+    % =========================================================
+
+    \coordinate (muxX)   at ($(mux.west)+(0,0.58)$);
+    \coordinate (muxXd)  at ($(mux.west)+(0,0.20)$);
+    \coordinate (muxI)   at ($(mux.west)+(0,-0.20)$);
+    \coordinate (muxXi)  at ($(mux.west)+(0,-0.58)$);
+
+    \node[left, xshift=-0.1cm,yshift=0.2cm] at (muxX)  {$x$};
+    \node[left, xshift=-0.1cm,yshift=0.2cm] at (muxXd) {$\hat{\dot{x}}$};
+    \node[left, xshift=-0.1cm,yshift=0.2cm] at (muxI)  {$i$};
+    \node[left, xshift=-0.1cm,yshift=0.2cm] at (muxXi) {$x_i$};
+
+    % =========================================================
+    % xi from integrator to MUX
+    % separate left vertical lane
+    % =========================================================
+
+    \draw[signal] (int.east) -- ++(0.35,0) coordinate (xiLaneTop);
+    \draw[signal] (xiLaneTop) |- ($(muxXi)+(-0.45,0)$);
+    \draw[line] ($(muxXi)+(-0.45,0)$) -- (muxXi);
+
+    % =========================================================
+    % Current measured bus
+    % horizontal lower line
+    % =========================================================
+
+    \draw[signal] (itap) |- (8.5,-1.5);
+    \draw[signal] (8.5,-1.5) -- (1.45,-1.5);
+    \draw[signal] (1.45,-1.5) |- ($(muxI)+(-0.28,0)$);
+    \draw[line] ($(muxI)+(-0.28,0)$) -- (muxI);
+
+    % =========================================================
+    % Position state
+    % horizontal upper line
+    % =========================================================
+
+    \draw[signal] (xtap) |- (10.55,+1.7);
+    \draw[signal] (10.55,+1.7) -- (2.0,+1.7);
+    \draw[signal] (2.0,+1.7) |- ($(muxX)+(-0.5,0)$);
+    \draw[line] ($(muxX)+(-0.5,0)$) -- (muxX);
+
+    % =========================================================
+    % Observer inputs from measured current and position
+    % =========================================================
+
+    % Current
+    \coordinate (obs_i_in)  at ($(obs.east)+(0,0.22)$);
+    \coordinate (obs_i_out) at ($(obs_i_in)+(0.35,0)$);
+
+    \draw[signal] (itap) |- (obs_i_out);
+    \draw[line] (obs_i_out) -- (obs_i_in);
+    \node[right, xshift=0.05cm, yshift=0.2cm] at (obs_i_out) {$i$};
+
+    % Position
+    \coordinate (obs_x_in)  at ($(obs.east)+(0,-0.22)$);
+    \coordinate (obs_x_out) at ($(obs_x_in)+(0.35,0)$);
+
+    \draw[signal] (xtap) |- (obs_x_out);
+    \draw[line] (obs_x_out) -- (obs_x_in);
+    \node[right, xshift=0.05cm, yshift=0.2cm] at (obs_x_out) {$x$};
+
+    % =========================================================
+    % Observer outputs
+    % x_hat shown but not used by PP
+    % xdot_hat sent to the MUX
+    % =========================================================
+
+    % estimated postion
+    \draw[line] ($(obs.west)+(0,0.22)$) -- ++(-0.65,0)
+        node[left] {$\hat{x}$};
+
+    % estimated velocity
+    \draw[signal] ($(obs.west)+(0,-0.22)$) -- ++(-4.0,0)
+        coordinate (xdLaneLow)
+        node[midway, below] {$\hat{\dot{x}}$};
+
+    \draw[signal] (xdLaneLow) |- ($(muxXd)+(-0.55,0)$);
+    \draw[line] ($(muxXd)+(-0.55,0)$) -- (muxXd);
+
+    % =========================================================
+    % State definition
+    % =========================================================
+
+    \node[align=center] at (3.30,-3.35)
+    {$x_{\mathrm{aug}} =
+    \begin{bmatrix}
+    x & \hat{\dot{x}} & i & x_i
+    \end{bmatrix}^{T}$,
+    \qquad
+    $x_i = \displaystyle \int (x_{ref}-x)\,dt$};
+
+    \end{tikzpicture}
+    }
+    \caption{Pole placement control scheme with integral action and state observer.}
+    \label{fig:pp_integral_observer_clean}
+\end{figure}
 
 \paragraph{Requirements}
-\textcolor{red}{how work pp, why we use $\omega_i$}
+The pole $-\omega_i$ is included in the state-space model, in order to consider the inner current loop dynamics $H_i$,
+instead of considering the current as instantaneous.
+During pole placement the electrical pole is kept in the desired pole set, because this dynamics is already much faster than
+the mechanical response and is fixed by the current controller.
 
-\paragraph{Simple pole placement}
-The controller uses full-state feedback on the entire system model. The desired closed-loop poles in \texttt{SS\_model\_PP.m} are
+The simple pole-placement controller with reference scaling was not retained as final solution,
+because it does not guarantee robust zero steady-state error on the real plant. The implemented
+controller is therefore the pole placement with integral action, which adds an integral state on the
+position error:
 \begin{equation}
-    p_{ctrl} = \{-70, -75, -\omega_i\},
+    \dot{x_i} = x_{ref} - x.
 \end{equation}
-and the feedback gain is computed with
-\begin{equation}
-    K_{pp} = \mathrm{place}(A_{ext}, B_{ext}, p_{ctrl}).
-\end{equation}
-
-The control law is
-\begin{equation}
-    \Delta i_{ref} = -K_{pp} \hat{\vect{x}}_{ext} + K_{ref} \Delta x_{ref}.
-\end{equation}
-The reference scaling used in \texttt{SS\_model\_PP.m} is
-\begin{equation}
-    K_{ref} = -\frac{1}{C_{pos}\left(A_{ext} - B_{ext} K_{pp}\right)^{-1} B_{ext}},
-\end{equation}
-with $C_{pos} = \begin{bmatrix} 1 & 0 & 0 \end{bmatrix}$.
-
 
 \paragraph{Pole placement with integral action}
-To remove steady-state error and achieve the position reference, an integrator on the position error is added:
-\begin{equation}
-    \dot{x_i} = \Delta x_{ref} - \Delta x.
-\end{equation}
-The augmented state is $\vect{x}_{aug} = \begin{bmatrix} \vect{x}_{ext} & x_i \end{bmatrix}^T$, with
+The augmented state is $\vect{x}_{aug} = \begin{bmatrix} \vect{x} & x_i \end{bmatrix}^T$, with
 \begin{equation}
     A_{aug} =
     \begin{bmatrix}
-        A_{ext} & 0 \\
+        A & 0 \\
         -C_{pos} & 0
     \end{bmatrix},
     \quad
     B_{aug} =
     \begin{bmatrix}
-        B_{ext} \\
+        B \\
         0
     \end{bmatrix},
     \quad
-    B_{r} =
-    \begin{bmatrix}
-        0 \\
-        1
-    \end{bmatrix}.
 \end{equation}
 
-\textcolor{red}{why the integrator pole is at...}
+
+The controllability of the augmented pair $(A_{aug},B_{aug})$ is checked in
+\texttt{SS\_model\_PP.m} before applying pole placement. The gain is then obtained from
+\begin{equation}
+    K_{aug} = \mathrm{place}(A_{aug}, B_{aug}, p_{ctrl,aug})
+    =
+    \begin{bmatrix}
+        K_x & K_i
+    \end{bmatrix}.
+\end{equation}
+With $K_i$ the gain of the integral action and $K_x$ the state feedback gain.
+
+
+The implemented control law is
+\begin{equation}
+    \Delta i_{ref}
+    =
+    -K_x
+    \begin{bmatrix}
+        \Delta x\\
+        \Delta\hat{\dot{x}}\\
+        \Delta i
+    \end{bmatrix}
+    -K_i x_i.
+\end{equation}
+The measured position and current are used directly, while the velocity is provided by the state
+observer described in the previous subsection.
+
 In \texttt{SS\_model\_PP.m} the integral pole is chosen as $p_{int} = -3$ and the augmented pole set is
 \begin{equation}
     p_{ctrl,aug} = \{-70, -75, p_{int}, -\omega_i\}.
 \end{equation}
-The gain is obtained with
+The poles $-70$ and $-75$ set the dominant mechanical closed-loop dynamics. The integral pole is placed
+at $-3$. Different integral-pole choices were tested during validation, but the final
+choice with $p_{int}=-3$ gave a better compromise.
+Lower values of $p_{int}$ are too near the imaginary axis, and values higher than $-5$ introduce oscillations in the response.
+
+\paragraph{Closed loop system}
+Here $C_{aug} = \begin{bmatrix}1 & 0 & 0 & 0\end{bmatrix}$ selects the position state from
+$\vect{x}_{aug}$. After applying the feedback gain, the augmented closed-loop matrix is
 \begin{equation}
-    K_{aug} = \mathrm{place}(A_{aug}, B_{aug}, p_{ctrl,aug}) = \begin{bmatrix} K_x & K_i \end{bmatrix}.
+    A_{cl,aug} = A_{aug} - B_{aug}K_{aug}.
 \end{equation}
+The reference enters only through the integrator state, therefore
+\begin{equation}
+    B_{r,aug} =
+    \begin{bmatrix}
+        0\\
+        0\\
+        0\\
+        1
+    \end{bmatrix}.
+\end{equation}
+
+
+The closed loop FDT is:
+\begin{equation}
+    H_x(s) =
+    C_{aug}\left(sI-A_{cl,aug}\right)^{-1}B_{r,aug},
+\end{equation}
+ The eigenvalues of $A_{cl,aug}$ are the assigned poles with PP.
+
+ \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../img/PPI_validation/BODE_Hx_PPI.png}
+    \caption{Bode diagram of $H_x(s)$ with pole placement control.}
+    \label{fig:bode_hx_ppi}
+\end{figure}

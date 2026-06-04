@@ -1,11 +1,27 @@
 \subsection{Pole placement validation}
 
-The PP and PPI controllers are implemented in Simulink and tested on the physical setup. The experimental response is compared with the simulated one.
-
 \subsubsection{Time-Domain Validation}
 
-Report here the measured step response, overshoot, settling time, steady-state error, and current effort.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{../img/PPI_validation/ramp.png}
+	\caption{Time-domain validation with ramp reference.}
+	\label{fig:ppi_time_ramp}
+\end{figure}
 
-\subsubsection{Frequency-Domain Validation}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{../img/PPI_validation/current.png}
+	\caption{Measured current during ramp validation.}
+	\label{fig:ppi_time_current}
+\end{figure}
 
-Report here the measured sinusoidal responses and the comparison with the predicted frequency response.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{../img/PPI_validation/speed.png}
+	\caption{Measured speed during ramp validation.}
+	\label{fig:ppi_time_speed}
+\end{figure}
+
+
+

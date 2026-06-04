@@ -127,19 +127,58 @@
     \label{fig:state_observer}
 \end{figure}
 
-\textcolor{red}{EXPLAIN WHY WE NEED AN OBSERVER}
-A Luenberger observer is used to estimate $\Delta x$ and $\Delta \dot{x}$ from the position measurement. In \texttt{SS\_model\_PP.m} the observer poles are placed at
+\paragraph{Why an observer}
+Only the ball position and the coil current are directly measured on the real setup, while the ball
+velocity is required by the state-feedback controller. A numerical derivative of the measured position
+would amplify sensor noise and would make the feedback action less robust. For this reason, a
+Luenberger observer is introduced on the linearized mechanical subsystem. The measured current is used
+as a known input to the mechanical model, while the measured position is used to correct the estimated
+state.
+
+In \texttt{SS\_model\_PP.m} the observer poles are placed at
 \begin{equation}
     p_{obs} = \{-500, -600\}.
 \end{equation}
+Those poles are chosen to be significantly faster than the closed-loop poles of the system,
+in order to ensure a good estimation performance.
+
 The observer gain is computed with
 \begin{equation}
     L_{obs} = \mathrm{place}(A_x^T, C_x^T, p_{obs})^T.
 \end{equation}
 
-\textcolor{red}{ACKERMANN FORMULA}
 
-The observer dynamics are
+\paragraph{Ackermann's formula}
+Since $(A_x,C_x)$ is observable, the dual pair $(A_x^T,C_x^T)$ is controllable, also the subsystem is SI(Single Input),
+therefore Ackermann's formula can be applied to compute the observer gain. Defining
 \begin{equation}
-    \dot{\hat{\vect{x}}} = (A_x - L_{obs} C_x)\hat{\vect{x}} + B_x \Delta i_{ref} + L_{obs} \Delta x.
+    \mathcal{C}_d =
+    \begin{bmatrix}
+        C_x^T & A_x^T C_x^T
+    \end{bmatrix},
+    \qquad
+    \phi_{obs}(s) =
+    (s-p_{obs,1})(s-p_{obs,2}),
 \end{equation}
+the observer gain is obtained as
+\begin{equation}
+    L_{obs}^T =
+    \begin{bmatrix}
+        0 & 1
+    \end{bmatrix}
+    \mathcal{C}_d^{-1}
+    \phi_{obs}(A_x^T).
+\end{equation}
+
+The resulting observer dynamics are
+\begin{equation}
+    \dot{\hat{\vect{x}}}
+    =
+    (A_x - L_{obs} C_x)\hat{\vect{x}}
+    +
+    B_x \Delta i_{\mathrm{meas}}
+    +
+    L_{obs} \Delta x_{\mathrm{meas}}.
+\end{equation}
+
+
