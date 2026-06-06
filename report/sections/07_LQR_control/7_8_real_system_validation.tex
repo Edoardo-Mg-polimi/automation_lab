@@ -56,7 +56,8 @@ motivating the Kalman speed estimate.
     \label{fig:lqri_time_validation}
 \end{figure}
 
-
+The performance of the Linear Quadratic Regulator with Integral action (LQRI) offers a significant improvement over the deterministic pole-placement approach, particularly regarding noise rejection. As shown in Figure (d), the continuous-time Kalman filter provides a significantly smoother and more reliable velocity estimate compared to a standard numerical derivative or the previously implemented Luenberger observer.
+Because this velocity estimate is substantially cleaner, the resulting control effort is far less erratic. Figure (c) illustrates that the current tracking avoids the severe saturation bouncing observed in the pole-placement validation. Consequently, the position tracking on Figure (a) is considerably tighter and smoother around the 7 mm operating point.
 
 \subsubsection{Frequency-Domain Validation}
 The frequency-domain validation is performed with sinusoidal references at
@@ -122,3 +123,7 @@ $15$ & $2.3800$ & $-17.31$ & $-175.8$ \\
     \caption{LQRI validation for a sinusoidal reference with $\omega = 6$ rad/s.}
     \label{fig:lqri_validation_6_rad}
 \end{figure}
+
+The experimental frequency-domain responses accurately reflect the closed-loop dynamics predicted by the theoretical models. At low frequency of 1 rad/s on Figure 33, the physical system tracks the sinusoidal reference almost perfectly. It matches the theoretical simulation with a minimal phase shift of -30.25° and negligible magnitude attenuation.
+As the reference frequency increases to 6 rad/s and 15 rad/s on Figure 34, the system approaches and surpasses its closed-loop bandwidth limitations, which were theoretically estimated at approximately 2.95 rad/s. Table 8 shows this performance degradation, showing that the signal attenuation severely drops to -17.31 dB at 15 rad/s.
+In conclusion, these experimental frequency responses validate the theoretical closed-loop Bode diagram of Figure 31. The alignment between the measured attenuation and phase shifts with the simulated margins confirms the high accuracy of the linearized mechanical model and the robustness of the implemented LQRI tuning.
