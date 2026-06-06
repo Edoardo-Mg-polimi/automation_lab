@@ -109,12 +109,12 @@ phase_m = 90; %margine di fase in deg
 fprintf("Requirements: wc=%f , phase margin=%f \n", wc, phase_m);
 phiG_deg = -atand((wc*Lc)/R_tot);%fase a omega c
 Ti = 1/(wc * tand(180 + phiG_deg -phase_m));
-Ki_p = sqrt(R_tot^2 + (wc*Lc)^2) / ( Kg * sqrt(1 + 1/(wc^2 * Ti^2)) );
-Ki_i = Ki_p/Ti;
-fprintf("Kp = %f\n", Ki_p);
-fprintf("Ki = %f\n", Ki_i);
+K_i_p = sqrt(R_tot^2 + (wc*Lc)^2) / ( Kg * sqrt(1 + 1/(wc^2 * Ti^2)) );
+K_i_i = K_i_p/Ti;
+fprintf("Kp = %f\n", K_i_p);
+fprintf("Ki = %f\n", K_i_i);
 
-R_i = Ki_p + Ki_i/s %current controller PI
+R_i = K_i_p + K_i_i/s %current controller PI
 [R_i_num, R_i_den] = tfdata(R_i, 'v');
 
 L_i = G_i*R_i; %current open loop tf
@@ -142,8 +142,15 @@ fprintf("Bandwidth of H_i = %f \n", bw_i);
 % title('Step response of H_i')
 % grid on
 
+% figure
+% bode(H_i)
+% hold on
+% plot(-1, 0, 'rx', 'MarkerSize', 14, 'LineWidth', 2)
+% title('Bode Diagram of H_i')
+% grid on
 
-%% 4) Regolatore Posizione
+
+%% 4) Frequency-Based Position Controller 
 
 G_out = H_i*G_p %current closed loop tf * position plant
 fprintf("Poles of G_out = \n");
@@ -151,14 +158,10 @@ pole(G_out)
 fprintf("Zeros of G_out = \n");
 zero(G_out)
 
-%Stabilizing Regulator
+%% Stabilizing Regulator
 
-% R_p_stab = 10284*(s^2 + 97.12*s + 2387)/(s+400)^2 %try 6
-%R_p_stab = 11111*(s^2 + 105.8*s + 2819)/(s+400)^2 %try 5
-%R_p_stab = 8892.7*(s^2 + 106*s + 2909)/(s+400)^2 %try 4
-%R_p_stab = 10500*(s^2 + 106.1*s + 4073)/(s^2 + 832.1*s + 1.732e05) %try 3
-%R_p_stab = 10673*(s^2 + 110.5*s + 1.634e04)/(s^2 + 831.3*s + 1.732e05) %try 2
-R_p_stab = 1984*(s^2 + 105.8*s + 5298)/(s^2 + 400*s + 4.09e04)  %try 1
+%stabilizing regulator parameters, calculated using sisoTool and Root Locus
+R_p_stab = 1984*(s^2 + 105.8*s + 5298)/(s^2 + 400*s + 4.09e04)
 
 [R_p_stab_num, R_p_stab_den] = tfdata(R_p_stab, 'v');
 
@@ -174,11 +177,25 @@ zero(H_p_stab)
 bw_p_stab = bandwidth(H_p_stab);
 fprintf("Bandwidth of H_p = %f \n", bw_p_stab);
 
-%Reference Tracking Regulator
+% figure
+% nyquist(L_p_stab)
+% hold on
+% plot(-1, 0, 'rx', 'MarkerSize', 14, 'LineWidth', 2)
+% title('Nyquist Diagram of the Stabilized System')
+% grid on
+
+% figure
+% rlocus(L_p_stab)
+% hold on
+% plot(-1, 0, 'rx', 'MarkerSize', 14, 'LineWidth', 2)
+% title('Root Locus of the Stabilized System')
+% grid on
+
+%% Reference Tracking Regulator
 
 %PID parameters, calculated using pidTuner
 K_p_p = 0; 
-K_p_i = 6.463;
+K_p_i = 3.0183;
 K_p_d = 0;
 
 PID_p = K_p_p + K_p_i/s + s*K_p_d;
@@ -201,12 +218,12 @@ zero(H_p)
 bw_p = bandwidth(H_p);
 fprintf("Bandwidth of H_p = %f \n", bw_p);
 
-figure
-step(H_p)
-hold on
-plot(-1, 0, 'rx', 'MarkerSize', 14, 'LineWidth', 2)
-title('Step Response of H_p')
-grid on
+% figure
+% bode(H_p)
+% hold on
+% plot(-1, 0, 'rx', 'MarkerSize', 14, 'LineWidth', 2)
+% title('Bode Diagram of H_p')
+% grid on
 
 % figure
 % nyquist(L_p)
@@ -214,3 +231,4 @@ grid on
 % plot(-1, 0, 'rx', 'MarkerSize', 14, 'LineWidth', 2)
 % title('Nyquist of L_p')
 % grid on
+
