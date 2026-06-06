@@ -28,6 +28,7 @@ the calibration factor $R_{cal}$ obtained from current measurements:
 \[
 R = R_{cal}(R_c + R_s)
 \]
+The computation of this calibration factor is done via experimental procedures. As stated, just the nominal resistance value $(R_c + R_s)$ does not account for a non-ideal condition, given that it does not take into account the thermal effects of the coil heating up during continuous operation. The way we determine this factor is by applying a constant DC voltage on the electromagnet and then measuring the resulting steady-state current. After this, we calculate the operational resistance of the circuit with Ohm's law. $R_{cal}$ is defined as the ratio of this measured operational resistance to the nominal datasheet resistance. This correction explains why the experimentally estimated electrical pole slightly deviates from the purely theoretical value.
 
 When the amplifier gain is included, the coil voltage can be written as
 \begin{equation}
