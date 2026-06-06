@@ -36,4 +36,7 @@
 	\label{fig:ppi_time_validation}
 \end{figure}
 
+These time-domain responses presented above demonstrate both the theoretical capabilities and the practical limitations of the pole-placement controller. If we look at Figure (a), the controller successfully tracks the ramp reference and settles at the 7 mm equilibrium point, confirming that the integral action correctly eliminates steady-state offset. However, the position response shows continuous, high-frequency oscillations around the setpoint.
+These oscillations are due to high control effort, as we can observe in Figure (b). The requested current frequently spikes and hits the $\pm 3$ A saturation limits, causing the oscillations visible in the mechanical position.
+This hard control action can be seen in Figure (c). Because the Luenberger observer poles were placed far into the left half-plane ($p_{obs}=\{-500,-600\}$) to ensure rapid convergence, the estimator becomes highly sensitive to the optical position sensor's measurement noise. This noise is amplified during velocity estimation and fed directly back into the control loop. In conclusion, while the pole-placement design successfully stabilizes the open-loop unstable plant mathematically, the deterministic Luenberger observer lacks the statistical noise-rejection properties required for smooth operation on this physically noisy hardware, creating the position error represented in Figure (d). 
 
